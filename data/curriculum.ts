@@ -72,8 +72,8 @@ Implement a function that computes the dot product of two equal-length lists of 
           {
             id: "tc5",
             description: "mismatched lengths raise ValueError",
-            callExpression: "type(None) if not isinstance((lambda: (lambda: (_ for _ in ()).throw(None))(), Exception) else None).__name__",
-            expectedOutput: "'NoneType'",
+            callExpression: "_raises(lambda: dot_product([1, 2], [1, 2, 3]), ValueError)",
+            expectedOutput: "True",
           },
         ],
         hints: [
@@ -481,8 +481,8 @@ The heap property: every parent is ≤ its children.
           {
             id: "tc3",
             description: "pop empty raises IndexError",
-            callExpression: "(lambda h: (lambda: (_ for _ in ()).throw(IndexError()) if True else None)() if True else None)",
-            expectedOutput: "None",
+            callExpression: "_raises(lambda: MinHeap().pop(), IndexError)",
+            expectedOutput: "True",
           },
         ],
         hints: [

@@ -59,6 +59,15 @@ _captured = _stdout_buf.getvalue()
 if _captured:
     print(_captured, end='')
 
+def _raises(fn, exc_type):
+    try:
+        fn()
+        return False
+    except exc_type:
+        return True
+    except Exception:
+        return False
+
 ${testBlocks}
 `;
 }

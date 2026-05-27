@@ -101,6 +101,7 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
   const [hintsOpen, setHintsOpen] = useState(false);
   const [revealedHints, setRevealedHints] = useState<number[]>([]);
   const [justPassed, setJustPassed] = useState(false);
+  const [xpJustEarned, setXpJustEarned] = useState(false);
   const runBtnRef = useRef<HTMLButtonElement>(null);
 
   if (!challenge) {
@@ -135,6 +136,7 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
     setRunError(undefined);
     setStdout("");
     setJustPassed(false);
+    setXpJustEarned(false);
 
     const harness = buildHarness(code, challenge.testCases);
     const runPromise = runCode(harness);
@@ -158,18 +160,11 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
 
       if (parsed.allPassed && !alreadyCompleted) {
         setJustPassed(true);
+        setXpJustEarned(true);
         addCompletedChallenge(challenge.id, challenge.moduleId, challenge.xpReward);
         setXpBurst(true);
-        toast.success(`+${challenge.xpReward} XP — Challenge complete!`, {
-          icon: "⚡",
-          duration: 3000,
-        });
-        setTimeout(() => {
-          if (nextChallenge) router.push(`/challenge/${nextChallenge.slug}`);
-        }, 2500);
       } else if (parsed.allPassed && alreadyCompleted) {
         setJustPassed(true);
-        toast.success("All tests pass ✓");
       }
     } catch (err) {
       setRunError(err instanceof Error ? err.message : String(err));
@@ -400,45 +395,184 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
               <CodeEditor value={code} onChange={setCode} height="400px" />
             </motion.div>
 
-            {/* Run button */}
-            <motion.button
-              ref={runBtnRef}
-              onClick={handleRun}
-              disabled={!pyReady || running}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35, delay: 0.12 }}
-              whileTap={pyReady && !running ? { scale: 0.98 } : {}}
-              className="run-btn-ready w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm text-white transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
-              style={{
-                background: running
-                  ? "linear-gradient(135deg, #5a4fcf 0%, #6b5ed8 100%)"
-                  : justPassed
-                  ? "linear-gradient(135deg, #0d9e6e 0%, #10b981 100%)"
-                  : "linear-gradient(135deg, #7c6af7 0%, #9585ff 100%)",
-                boxShadow: pyReady && !running
-                  ? "0 4px 20px rgba(124,106,247,0.3)"
-                  : "none",
-                transition: "background 0.4s ease, box-shadow 0.3s ease",
-              }}
-            >
-              {running ? (
-                <>
-                  <Loader2 size={15} className="animate-spin" />
-                  Running…
-                </>
-              ) : justPassed ? (
-                <>
-                  <CheckCircle2 size={15} />
-                  All Tests Passed
-                </>
+            {/* Run / Completion CTA */}
+            <AnimatePresence mode="wait">
+              {justPassed ? (
+                /* ── Completion card ─────────────────────── */
+                <motion.div
+                  key="completion"
+                  initial={{ opacity: 0, y: 10, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -6, scale: 0.97 }}
+                  transition={{ duration: 0.32, ease: [0.2, 0, 0, 1] }}
+                  className="rounded-xl overflow-hidden"
+                  style={{
+                    border: xpJustEarned
+                      ? "1px solid rgba(245,158,11,0.28)"
+                      : "1px solid rgba(16,185,129,0.25)",
+                    background: xpJustEarned
+                      ? "linear-gradient(180deg, rgba(245,158,11,0.07) 0%, rgba(11,13,20,0.95) 50%)"
+                      : "linear-gradient(180deg, rgba(16,185,129,0.06) 0%, rgba(11,13,20,0.95) 50%)",
+                    boxShadow: xpJustEarned
+                      ? "0 0 48px rgba(245,158,11,0.1), 0 0 0 1px rgba(245,158,11,0.08)"
+                      : "0 0 32px rgba(16,185,129,0.08)",
+                  }}
+                >
+                  {/* Header strip */}
+                  <div
+                    className="flex items-center justify-between px-4 py-2.5"
+                    style={{
+                      borderBottom: xpJustEarned
+                        ? "1px solid rgba(245,158,11,0.14)"
+                        : "1px solid rgba(16,185,129,0.12)",
+                    }}
+                  >
+                    {xpJustEarned ? (
+                      <motion.div
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.12 }}
+                        className="flex items-center gap-2"
+                      >
+                        <span
+                          className="font-display font-bold tabular-nums"
+                          style={{ fontSize: "15px", color: "#f59e0b" }}
+                        >
+                          +{challenge.xpReward} XP
+                        </span>
+                        <span className="text-xs" style={{ color: "#78716c" }}>
+                          earned
+                        </span>
+                      </motion.div>
+                    ) : (
+                      <div className="flex items-center gap-1.5">
+                        <CheckCircle2 size={13} style={{ color: "#10b981" }} />
+                        <span className="text-xs font-medium" style={{ color: "#10b981" }}>
+                          All tests pass
+                        </span>
+                      </div>
+                    )}
+
+                    <motion.div
+                      initial={{ opacity: 0, x: 8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.18 }}
+                      className="flex items-center gap-1.5"
+                    >
+                      <CheckCircle2 size={12} style={{ color: "#10b981" }} />
+                      <span className="text-[11px] font-mono" style={{ color: "#059669" }}>
+                        progress saved
+                      </span>
+                    </motion.div>
+                  </div>
+
+                  {/* Body */}
+                  <div className="px-4 py-3 space-y-2.5">
+                    {xpJustEarned && (
+                      <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.22 }}
+                        className="text-xs font-medium"
+                        style={{ color: "var(--color-text-tertiary)" }}
+                      >
+                        Challenge complete
+                        {nextChallenge && (
+                          <span style={{ color: "#3d4460" }}>
+                            {" "}· up next:{" "}
+                            <span style={{ color: "#6b7689" }}>{nextChallenge.title}</span>
+                          </span>
+                        )}
+                      </motion.p>
+                    )}
+
+                    <motion.div
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.26, ease: [0.2, 0, 0, 1] }}
+                    >
+                      {nextChallenge ? (
+                        <Link href={`/challenge/${nextChallenge.slug}`}>
+                          <motion.div
+                            whileHover={{ scale: 1.008 }}
+                            whileTap={{ scale: 0.994 }}
+                            className="w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-sm text-white cursor-pointer select-none"
+                            style={{
+                              background: "linear-gradient(135deg, #7c6af7 0%, #9585ff 100%)",
+                              boxShadow: "0 4px 24px rgba(124,106,247,0.45), 0 0 0 1px rgba(124,106,247,0.2)",
+                            }}
+                          >
+                            Continue
+                            <ArrowRight size={14} />
+                          </motion.div>
+                        </Link>
+                      ) : (
+                        <Link href="/">
+                          <motion.div
+                            whileHover={{ scale: 1.008 }}
+                            whileTap={{ scale: 0.994 }}
+                            className="w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-sm text-white cursor-pointer select-none"
+                            style={{
+                              background: "linear-gradient(135deg, #7c6af7 0%, #9585ff 100%)",
+                              boxShadow: "0 4px 24px rgba(124,106,247,0.45)",
+                            }}
+                          >
+                            Back to Curriculum
+                            <ArrowRight size={14} />
+                          </motion.div>
+                        </Link>
+                      )}
+                    </motion.div>
+
+                    <motion.button
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.38 }}
+                      onClick={() => { setJustPassed(false); setXpJustEarned(false); }}
+                      className="w-full text-center text-xs py-1 transition-colors duration-150"
+                      style={{ color: "#2d3557" }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = "#6b7689")}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = "#2d3557")}
+                    >
+                      keep editing
+                    </motion.button>
+                  </div>
+                </motion.div>
               ) : (
-                <>
-                  <Play size={15} />
-                  Run Code
-                </>
+                /* ── Run Code button ─────────────────────── */
+                <motion.button
+                  key="run"
+                  ref={runBtnRef}
+                  onClick={handleRun}
+                  disabled={!pyReady || running}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.28 }}
+                  whileTap={pyReady && !running ? { scale: 0.98 } : {}}
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm text-white disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={{
+                    background: running
+                      ? "linear-gradient(135deg, #5a4fcf 0%, #6b5ed8 100%)"
+                      : "linear-gradient(135deg, #7c6af7 0%, #9585ff 100%)",
+                    boxShadow: pyReady && !running ? "0 4px 20px rgba(124,106,247,0.3)" : "none",
+                    transition: "background 0.3s ease, box-shadow 0.3s ease",
+                  }}
+                >
+                  {running ? (
+                    <>
+                      <Loader2 size={15} className="animate-spin" />
+                      Running…
+                    </>
+                  ) : (
+                    <>
+                      <Play size={15} />
+                      Run Code
+                    </>
+                  )}
+                </motion.button>
               )}
-            </motion.button>
+            </AnimatePresence>
 
             {/* Test results */}
             <TestResultPanel
