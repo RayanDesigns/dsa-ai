@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DSA for AI Engineering
 
-## Getting Started
+A focused, challenge-driven course that teaches data structures and algorithms through the lens of AI engineering — in under 6 hours.
 
-First, run the development server:
+Every algorithm is explained in terms of where it actually appears in AI systems: embedding search, token processing, beam search, RAG pipelines, knowledge graphs, and more. You write real Python code that runs in the browser — no installs, no setup.
+
+## What it is
+
+- **8 modules, 24 challenges** — sequentially unlocked, XP-gated progression
+- **Python in the browser** — Pyodide WASM runtime, real execution, instant feedback
+- **AI-first framing** — not "implement a hash map" but "build the token lookup table that powers a tokenizer"
+- **2,500 XP total** — earn XP per challenge, track mastery across modules
+
+## Curriculum
+
+| # | Module | Focus | Time |
+|---|--------|-------|------|
+| 1 | Vectors & Embeddings | Dot product, cosine similarity, brute-force KNN | 45 min |
+| 2 | Hash Maps for AI | Token frequency, inverted index, TF-IDF | 45 min |
+| 3 | Heaps & Top-K Search | Min-heap, top-K tokens, beam search | 40 min |
+| 4 | Graphs & Knowledge Graphs | BFS, DFS, PageRank | 45 min |
+| 5 | Trees & Hierarchical Clustering | BST, decision trees, hierarchical clustering | 40 min |
+| 6 | Sliding Window & Chunking | Fixed chunker, sliding window, context windowing | 40 min |
+| 7 | Sorting & Approximate Nearest Neighbor | Quickselect, merge sort, LSH buckets | 40 min |
+| 8 | Dynamic Programming | Edit distance, sequence alignment, optimal chunking | 35 min |
+
+## Stack
+
+- **Next.js 16** (App Router)
+- **Pyodide** — Python WASM runtime for in-browser code execution
+- **Firebase Auth** — Google sign-in, progress persistence
+- **Framer Motion** — animations
+- **Tailwind v4** — styling via `@theme` tokens
+
+## Running locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Requires a Firebase project with Google Auth enabled. Copy `.env.local.example` to `.env.local` and fill in your Firebase config.

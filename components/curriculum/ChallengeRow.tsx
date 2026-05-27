@@ -8,34 +8,54 @@ interface Props {
   challenge: Challenge;
   isCompleted: boolean;
   isLocked: boolean;
+  index?: number;
 }
 
-export function ChallengeRow({ challenge, isCompleted, isLocked }: Props) {
+export function ChallengeRow({ challenge, isCompleted, isLocked, index = 0 }: Props) {
   const inner = (
     <div
-      className={`flex items-center gap-4 p-4 rounded-xl border transition-all duration-150 ${
-        isLocked
-          ? "border-[var(--color-border-subtle)] opacity-40 cursor-not-allowed"
+      className={`
+        challenge-row-active animate-fade-in-up
+        flex items-center gap-4 px-4 py-3.5 rounded-xl border
+        transition-all duration-200
+        ${isLocked
+          ? "border-[var(--color-border-subtle)] opacity-35 cursor-not-allowed"
           : isCompleted
-          ? "border-emerald-500/20 bg-emerald-500/5 hover:border-emerald-500/40 cursor-pointer"
-          : "border-[var(--color-border)] bg-[var(--color-bg-card)] hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-bg-card-hover)] cursor-pointer"
-      }`}
+          ? "border-emerald-500/20 cursor-pointer hover:border-emerald-500/35"
+          : "border-[var(--color-border)] cursor-pointer hover:border-[var(--color-accent)]/35 hover:bg-[var(--color-bg-elevated)]"
+        }
+      `}
+      style={{
+        animationDelay: `${index * 50}ms`,
+        background: isCompleted ? "rgba(16,185,129,0.04)" : "rgba(19,22,31,0.8)",
+      }}
     >
       {/* Status icon */}
-      <div className="shrink-0">
+      <div className="shrink-0 w-5 flex items-center justify-center">
         {isLocked ? (
-          <Lock size={18} className="text-[var(--color-text-tertiary)]" />
+          <Lock size={15} style={{ color: "var(--color-text-tertiary)" }} />
         ) : isCompleted ? (
-          <CheckCircle2 size={18} className="text-emerald-400" />
+          <CheckCircle2 size={17} style={{ color: "#10b981" }} />
         ) : (
-          <Circle size={18} className="text-[var(--color-text-tertiary)]" />
+          <Circle size={16} style={{ color: "var(--color-text-tertiary)", strokeWidth: 1.5 }} />
         )}
       </div>
 
       {/* Text */}
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-[var(--color-text-primary)] truncate">{challenge.title}</p>
-        <p className="text-xs text-[var(--color-text-secondary)] mt-0.5 line-clamp-1">
+        <p
+          className="font-medium truncate leading-snug"
+          style={{
+            color: isCompleted ? "#eceef4" : "var(--color-text-primary)",
+            fontSize: "14px",
+          }}
+        >
+          {challenge.title}
+        </p>
+        <p
+          className="text-xs mt-0.5 line-clamp-1"
+          style={{ color: "var(--color-text-secondary)" }}
+        >
           {challenge.conceptHook}
         </p>
       </div>
@@ -44,7 +64,10 @@ export function ChallengeRow({ challenge, isCompleted, isLocked }: Props) {
       <div className="flex items-center gap-2 shrink-0">
         <DifficultyBadge difficulty={challenge.difficulty} />
         <XPBadge xp={challenge.xpReward} />
-        <div className="hidden sm:flex items-center gap-1 text-xs text-[var(--color-text-tertiary)]">
+        <div
+          className="hidden sm:flex items-center gap-1 text-xs"
+          style={{ color: "var(--color-text-tertiary)" }}
+        >
           <Clock size={11} />
           {challenge.estimatedMinutes}m
         </div>

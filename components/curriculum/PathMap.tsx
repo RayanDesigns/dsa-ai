@@ -30,6 +30,7 @@ export function PathMap() {
             completedCount={completed}
             isUnlocked={canAccessModule(idx)}
             isCurrent={idx === currentModuleIdx}
+            index={idx}
           />
         );
       })}

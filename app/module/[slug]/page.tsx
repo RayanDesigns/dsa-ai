@@ -1,6 +1,7 @@
 "use client";
 import { use } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   Layers, Hash, Triangle, Network, GitBranch,
   ScanLine, Zap, GitMerge, ArrowLeft, ArrowRight, Clock
@@ -21,7 +22,10 @@ export default function ModulePage({ params }: { params: Promise<{ slug: string 
 
   if (!module) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh] text-[var(--color-text-secondary)]">
+      <div
+        className="flex items-center justify-center min-h-[60vh] text-sm"
+        style={{ color: "var(--color-text-secondary)" }}
+      >
         Module not found.
       </div>
     );
@@ -40,64 +44,134 @@ export default function ModulePage({ params }: { params: Promise<{ slug: string 
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
-        <Link href="/" className="hover:text-[var(--color-text-primary)] transition-colors flex items-center gap-1">
-          <ArrowLeft size={14} />
+      {/* Back link */}
+      <motion.div
+        initial={{ opacity: 0, x: -6 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-sm transition-colors duration-150"
+          style={{ color: "var(--color-text-tertiary)" }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-text-secondary)")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-text-tertiary)")}
+        >
+          <ArrowLeft size={13} />
           Learning Path
         </Link>
-      </div>
+      </motion.div>
 
       {/* Module hero */}
-      <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-card)] p-6">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="rounded-2xl border p-6 overflow-hidden relative"
+        style={{
+          border: `1px solid ${module.accentColor}35`,
+          background: `linear-gradient(135deg, ${module.accentColor}07 0%, rgba(19,22,31,0.9) 60%)`,
+        }}
+      >
+        {/* Top accent line */}
+        <div
+          className="absolute top-0 left-0 right-0 h-px"
+          style={{
+            background: `linear-gradient(90deg, transparent 0%, ${module.accentColor}70 50%, transparent 100%)`,
+          }}
+        />
+
         <div className="flex items-start gap-4">
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-            style={{ backgroundColor: `${module.accentColor}20`, color: module.accentColor }}
+            style={{
+              backgroundColor: `${module.accentColor}18`,
+              color: module.accentColor,
+              boxShadow: `0 0 20px ${module.accentColor}25`,
+            }}
           >
-            <Icon size={24} />
+            <Icon size={22} />
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs text-[var(--color-text-tertiary)] font-mono">Module {module.order + 1}</span>
+              <span
+                className="text-[10px] font-mono uppercase tracking-wider"
+                style={{ color: "var(--color-text-tertiary)" }}
+              >
+                Module {module.order + 1}
+              </span>
             </div>
-            <h1 className="font-display text-2xl font-bold text-[var(--color-text-primary)] mb-2">
+            <h1
+              className="font-display font-bold mb-2"
+              style={{
+                fontSize: "1.4rem",
+                letterSpacing: "-0.015em",
+                color: "var(--color-text-primary)",
+              }}
+            >
               {module.title}
             </h1>
-            <p className="text-[var(--color-text-secondary)]">{module.aiContext}</p>
+            <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+              {module.aiContext}
+            </p>
           </div>
         </div>
 
         {/* Stats row */}
-        <div className="flex items-center gap-6 mt-5 pt-4 border-t border-[var(--color-border-subtle)] text-sm">
-          <div className="flex items-center gap-1.5 text-[var(--color-text-secondary)]">
-            <Clock size={14} />
+        <div
+          className="flex items-center gap-6 mt-5 pt-4 text-sm"
+          style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
+        >
+          <div
+            className="flex items-center gap-1.5"
+            style={{ color: "var(--color-text-secondary)" }}
+          >
+            <Clock size={13} />
             {module.estimatedMinutes} min
           </div>
-          <div className="text-amber-400 flex items-center gap-1">
-            ⚡ {module.totalXP} XP
+          <div
+            className="flex items-center gap-1 text-sm font-mono"
+            style={{ color: "#f59e0b" }}
+          >
+            <span style={{ opacity: 0.7 }}>⚡</span>
+            {module.totalXP} XP
           </div>
-          <div className="text-[var(--color-text-secondary)]">
+          <div style={{ color: "var(--color-text-secondary)" }}>
             {completedCount}/{total} completed
           </div>
         </div>
 
         {/* Progress bar */}
         <div className="mt-3">
-          <div className="h-1.5 rounded-full bg-[var(--color-border)] overflow-hidden">
-            <div
-              className="h-full rounded-full transition-all duration-700"
-              style={{ width: `${pct}%`, backgroundColor: module.accentColor }}
+          <div
+            className="h-1.5 rounded-full overflow-hidden"
+            style={{ background: "rgba(255,255,255,0.06)" }}
+          >
+            <motion.div
+              className="h-full rounded-full"
+              style={{
+                background: `linear-gradient(90deg, ${module.accentColor} 0%, ${module.accentColor}cc 100%)`,
+                boxShadow: `0 0 8px ${module.accentColor}50`,
+              }}
+              initial={{ width: "0%" }}
+              animate={{ width: `${pct}%` }}
+              transition={{ duration: 0.9, delay: 0.3, ease: [0.34, 1.1, 0.64, 1] }}
             />
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Challenge list */}
       <div className="space-y-2">
-        <h2 className="font-display font-semibold text-[var(--color-text-primary)]">
+        <motion.h2
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="font-display font-semibold mb-3"
+          style={{ color: "var(--color-text-primary)", fontSize: "15px" }}
+        >
           Challenges
-        </h2>
+        </motion.h2>
         {module.challenges.map((challenge, idx) => {
           const prevCompleted = idx === 0 || isCompleted(module.challenges[idx - 1].id);
           const isLocked = !isUnlocked || (idx > 0 && !prevCompleted);
@@ -108,6 +182,7 @@ export default function ModulePage({ params }: { params: Promise<{ slug: string 
               challenge={challenge}
               isCompleted={isCompleted(challenge.id)}
               isLocked={isLocked}
+              index={idx}
             />
           );
         })}
@@ -115,34 +190,62 @@ export default function ModulePage({ params }: { params: Promise<{ slug: string 
 
       {/* Start CTA */}
       {isUnlocked && completedCount === 0 && (
-        <Link
-          href={`/challenge/${module.challenges[0].slug}`}
-          className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white font-medium transition-colors"
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
         >
-          Start Module
-          <ArrowRight size={16} />
-        </Link>
+          <Link
+            href={`/challenge/${module.challenges[0].slug}`}
+            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-semibold text-sm text-white transition-all duration-200"
+            style={{
+              background: `linear-gradient(135deg, ${module.accentColor} 0%, ${module.accentColor}cc 100%)`,
+              boxShadow: `0 4px 20px ${module.accentColor}30`,
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
+              (e.currentTarget as HTMLElement).style.boxShadow = `0 8px 28px ${module.accentColor}40`;
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.transform = "";
+              (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 20px ${module.accentColor}30`;
+            }}
+          >
+            Start Module
+            <ArrowRight size={15} />
+          </Link>
+        </motion.div>
       )}
 
       {/* Module navigation */}
-      <div className="flex items-center justify-between pt-2 border-t border-[var(--color-border-subtle)]">
+      <div
+        className="flex items-center justify-between pt-3"
+        style={{ borderTop: "1px solid var(--color-border-subtle)" }}
+      >
         {prevModule ? (
           <Link
             href={`/module/${prevModule.slug}`}
-            className="flex items-center gap-1 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
+            className="flex items-center gap-1 text-sm transition-colors duration-150"
+            style={{ color: "var(--color-text-tertiary)" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-text-secondary)")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-text-tertiary)")}
           >
-            <ArrowLeft size={14} />
+            <ArrowLeft size={13} />
             {prevModule.title}
           </Link>
-        ) : <div />}
-
+        ) : (
+          <div />
+        )}
         {nextModule && (
           <Link
             href={`/module/${nextModule.slug}`}
-            className="flex items-center gap-1 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
+            className="flex items-center gap-1 text-sm transition-colors duration-150"
+            style={{ color: "var(--color-text-tertiary)" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-text-secondary)")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-text-tertiary)")}
           >
             {nextModule.title}
-            <ArrowRight size={14} />
+            <ArrowRight size={13} />
           </Link>
         )}
       </div>
