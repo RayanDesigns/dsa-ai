@@ -11,6 +11,16 @@ import { auth } from "@/lib/firebase";
 import { getProgress, createDefaultProgress, saveProgress } from "@/lib/firestore";
 import { useProgressStore } from "@/store/progress";
 
+function getOrCreateGuestUid(): string {
+  const key = "dsa-ai-guest-uid";
+  let uid = localStorage.getItem(key);
+  if (!uid) {
+    uid = `guest_${Math.random().toString(36).slice(2)}`;
+    localStorage.setItem(key, uid);
+  }
+  return uid;
+}
+
 interface AuthContextValue {
   user: User | null;
   loading: boolean;
@@ -28,7 +38,7 @@ const AuthContext = createContext<AuthContextValue>({
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const { setProgress, clearProgress } = useProgressStore();
+  const { setProgress } = useProgressStore();
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -47,7 +57,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setProgress(createDefaultProgress(firebaseUser.uid));
         }
       } else {
-        clearProgress();
+        // Guest: reuse persisted local progress or create fresh
+        const { progress: localProgress } = useProgressStore.getState();
+        if (!localProgress) {
+          const guestUid = getOrCreateGuestUid();
+          setProgress(createDefaultProgress(guestUid));
+        }
       }
       setLoading(false);
     });

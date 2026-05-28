@@ -1,5 +1,5 @@
 "use client";
-import { use, useState, useCallback, useRef } from "react";
+import { use, useState, useCallback, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -11,7 +11,7 @@ import { buildHarness, parseResults, checkSafety } from "@/lib/test-runner";
 import type { TestResult } from "@/lib/test-runner";
 import { DifficultyBadge, XPBadge } from "@/components/ui/Badge";
 import { TestResultPanel } from "@/components/editor/TestResultPanel";
-import { XPBurst } from "@/components/gamification/XPBurst";
+import { CelebrationOverlay } from "@/components/gamification/CelebrationOverlay";
 import {
   ArrowLeft, ArrowRight, Play, Loader2,
   ChevronDown, Clock, CheckCircle2, Brain
@@ -89,15 +89,23 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
   const { slug } = use(params);
   const router = useRouter();
   const challenge = getChallengeBySlug(slug);
-  const { isCompleted, addCompletedChallenge } = useProgress();
+  const { isCompleted, addCompletedChallenge, getSolution } = useProgress();
   const { ready: pyReady, loading: pyLoading, runCode } = usePyodide();
 
-  const [code, setCode] = useState(challenge?.starterCode ?? "");
+  const savedSolution = challenge ? getSolution(challenge.id) : null;
+  const [code, setCode] = useState(savedSolution ?? challenge?.starterCode ?? "");
+  const solutionRestored = useRef(false);
+  useEffect(() => {
+    if (!solutionRestored.current && savedSolution) {
+      setCode(savedSolution);
+      solutionRestored.current = true;
+    }
+  }, [savedSolution]);
   const [results, setResults] = useState<TestResult[]>([]);
   const [running, setRunning] = useState(false);
   const [stdout, setStdout] = useState("");
   const [runError, setRunError] = useState<string | undefined>();
-  const [xpBurst, setXpBurst] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
   const [hintsOpen, setHintsOpen] = useState(false);
   const [revealedHints, setRevealedHints] = useState<number[]>([]);
   const [justPassed, setJustPassed] = useState(false);
@@ -161,8 +169,8 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
       if (parsed.allPassed && !alreadyCompleted) {
         setJustPassed(true);
         setXpJustEarned(true);
-        addCompletedChallenge(challenge.id, challenge.moduleId, challenge.xpReward);
-        setXpBurst(true);
+        addCompletedChallenge(challenge.id, challenge.moduleId, challenge.xpReward, code);
+        setShowCelebration(true);
       } else if (parsed.allPassed && alreadyCompleted) {
         setJustPassed(true);
       }
@@ -179,7 +187,13 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
 
   return (
     <>
-      <XPBurst amount={challenge.xpReward} trigger={xpBurst} />
+      <CelebrationOverlay
+        show={showCelebration}
+        xpEarned={challenge.xpReward}
+        challengeTitle={challenge.title}
+        nextChallenge={nextChallenge}
+        onDismiss={() => setShowCelebration(false)}
+      />
 
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Breadcrumb */}

@@ -25,6 +25,7 @@ export function createDefaultProgress(uid: string): UserProgress {
     totalXP: 0,
     completedChallenges: [],
     moduleProgress,
+    solutions: {},
     sessions: [],
     lastActiveAt: Date.now(),
     streakDays: 0,

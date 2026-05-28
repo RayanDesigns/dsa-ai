@@ -63,6 +63,7 @@ export interface UserProgress {
   totalXP: number;
   completedChallenges: string[];
   moduleProgress: Record<string, ModuleProgress>;
+  solutions: Record<string, string>;
   sessions: Session[];
   lastActiveAt: number;
   streakDays: number;

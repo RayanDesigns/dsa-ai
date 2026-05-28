@@ -37,7 +37,7 @@ export function usePyodide(): PyodideHook {
     const outputChunks: string[] = [];
 
     try {
-      py.setStdout({ batched: (s) => outputChunks.push(s) });
+      py.setStdout({ batched: (s) => outputChunks.push(s + "\n") });
       await py.runPythonAsync(harness);
       return { output: outputChunks.join("") };
     } catch (err) {

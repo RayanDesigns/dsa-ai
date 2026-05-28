@@ -29,6 +29,9 @@ export function useProgress() {
     return null;
   };
 
+  const getSolution = (challengeId: string) =>
+    progress?.solutions?.[challengeId] ?? null;
+
   return {
     progress,
     isCompleted,
@@ -36,5 +39,6 @@ export function useProgress() {
     canAccessModule,
     getFirstIncompleteChallenge,
     addCompletedChallenge,
+    getSolution,
   };
 }
