@@ -1,330 +1,1199 @@
 "use client";
 
 import Link from "next/link";
+import { useRef } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { PathMap } from "@/components/curriculum/PathMap";
 import { useProgress } from "@/hooks/useProgress";
 import { MODULES } from "@/data/curriculum";
 import { MAX_XP } from "@/lib/xp";
 import {
-  ArrowRight, Zap, Clock, Code2,
-  Layers, Hash, Triangle, Network, GitBranch,
-  ScanLine, GitMerge, Cpu,
+  ArrowRight, Zap, Layers, Hash, Triangle, Network,
+  GitBranch, ScanLine, GitMerge, Cpu,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
 const ICONS: Record<string, React.ElementType> = {
-  Layers, Hash, Triangle, Network, GitBranch, ScanLine, Zap, GitMerge,
+  Layers, Hash, Triangle, Network, GitBranch, ScanLine, Zap, GitMerge, Cpu,
 };
 
-// ─── Module tile (Linear-style card) ──────────────────────────────────────
-function ModuleTile({
-  module,
-  index,
+const MODULE_COLORS = [
+  "#7c6af7", "#22d3ee", "#f59e0b", "#10b981",
+  "#9585ff", "#22d3ee", "#f87171", "#f59e0b",
+];
+
+// ─── Reusable fade-in wrapper ──────────────────────────────────────────────
+function FadeIn({
+  children,
+  delay = 0,
+  className,
 }: {
-  module: (typeof MODULES)[number];
-  index: number;
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
 }) {
-  const Icon = ICONS[module.icon] ?? Layers;
   return (
     <motion.div
-      initial={{ opacity: 0, y: 14 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.38, delay: 0.55 + index * 0.05, ease: [0.25, 1, 0.5, 1] }}
-      className="group p-4 rounded-xl"
-      style={{
-        border: "1px solid rgba(255,255,255,0.07)",
-        background: "rgba(255,255,255,0.025)",
-        transition: "border-color 0.18s ease, background 0.18s ease",
-        cursor: "default",
-      }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = `${module.accentColor}40`;
-        (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.045)";
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.07)";
-        (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.025)";
-      }}
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={className}
     >
-      {/* Icon */}
-      <div
-        className="w-7 h-7 rounded-lg flex items-center justify-center mb-3"
-        style={{
-          background: `${module.accentColor}18`,
-          color: module.accentColor,
-        }}
-      >
-        <Icon size={13} />
-      </div>
-      {/* Label */}
-      <p
-        className="font-mono mb-1"
-        style={{ fontSize: "9px", letterSpacing: "0.1em", color: "rgba(255,255,255,0.28)", textTransform: "uppercase" }}
-      >
-        M{module.order + 1}
-      </p>
-      <h3
-        className="font-semibold leading-snug"
-        style={{ fontSize: "12.5px", color: "rgba(255,255,255,0.88)" }}
-      >
-        {module.title}
-      </h3>
-      <p
-        className="mt-1"
-        style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)" }}
-      >
-        {module.challenges.length} challenges
-      </p>
+      {children}
     </motion.div>
   );
 }
 
-// ─── Landing (logged out) ──────────────────────────────────────────────────
-function LandingPage() {
+// ─── Challenge card mockup ─────────────────────────────────────────────────
+function ChallengeCardMockup() {
   return (
-    <div style={{ background: "#09090e", minHeight: "100vh" }}>
-
-      {/* ── Hero ───────────────────────────────────────────────── */}
-      <section
-        className="relative flex flex-col items-center justify-center text-center overflow-hidden"
-        style={{ minHeight: "92vh", padding: "0 24px" }}
+    <div style={{ position: "relative" }}>
+      {/* Glow behind card */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: "-40px",
+          background: "radial-gradient(ellipse at center, rgba(124,106,247,0.18) 0%, transparent 70%)",
+          pointerEvents: "none",
+        }}
+      />
+      <motion.div
+        animate={{ y: [0, -10, 0] }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        style={{
+          background: "var(--color-bg-card)",
+          border: "1px solid var(--color-border)",
+          borderRadius: "16px",
+          overflow: "hidden",
+          boxShadow: "0 0 0 1px rgba(124,106,247,0.12), 0 32px 80px rgba(0,0,0,0.7)",
+          position: "relative",
+        }}
       >
-        {/* Grid */}
+        {/* Topbar */}
         <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0"
           style={{
-            backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px)
-            `,
-            backgroundSize: "64px 64px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "12px 16px",
+            background: "var(--color-bg-elevated)",
+            borderBottom: "1px solid var(--color-border-subtle)",
           }}
-        />
-
-        {/* Spotlight — top-center radial glow */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute"
-          style={{
-            top: 0,
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: "900px",
-            height: "600px",
-            background: "radial-gradient(ellipse at 50% 0%, rgba(124,106,247,0.14) 0%, rgba(124,106,247,0.04) 45%, transparent 70%)",
-          }}
-        />
-
-        {/* Fade-out vignette at bottom */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute bottom-0 left-0 right-0"
-          style={{
-            height: "200px",
-            background: "linear-gradient(to bottom, transparent, #09090e)",
-          }}
-        />
-
-        {/* Content */}
-        <div className="relative z-10 flex flex-col items-center max-w-2xl w-full" style={{ gap: "28px" }}>
-
-          {/* Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45 }}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium"
-            style={{
-              border: "1px solid rgba(255,255,255,0.1)",
-              background: "rgba(255,255,255,0.04)",
-              color: "rgba(255,255,255,0.55)",
-              letterSpacing: "0.01em",
-            }}
-          >
-            <span
-              className="inline-block w-1.5 h-1.5 rounded-full"
-              style={{ background: "#7c6af7" }}
-            />
-            8 modules · 24 challenges · ~6 hours
-          </motion.div>
-
-          {/* Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.07 }}
-            className="font-display font-bold leading-[1.02]"
-            style={{
-              fontSize: "clamp(2.8rem, 7vw, 5.6rem)",
-              letterSpacing: "-0.04em",
-              color: "#ffffff",
-            }}
-          >
-            Master the algorithms<br />
-            <span style={{ color: "rgba(255,255,255,0.38)" }}>every AI engineer needs.</span>
-          </motion.h1>
-
-          {/* Subtext */}
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.14 }}
-            style={{
-              fontSize: "16px",
-              lineHeight: "1.65",
-              color: "rgba(255,255,255,0.44)",
-              maxWidth: "420px",
-            }}
-          >
-            Real Python execution, zero setup. Every data structure and
-            algorithm explained through the lens of AI engineering.
-          </motion.p>
-
-          {/* CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.2 }}
-            className="flex flex-col items-center gap-2.5"
-          >
-            <GoogleSignInButton />
-            <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.2)", letterSpacing: "0.01em" }}>
-              Progress saved · Free to start
-            </p>
-          </motion.div>
-
-          {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex items-center gap-8"
-            style={{ fontSize: "12.5px", color: "rgba(255,255,255,0.3)" }}
-          >
-            <span className="flex items-center gap-1.5">
-              <Clock size={12} style={{ color: "rgba(124,106,247,0.65)" }} />
-              ≤ 6 hours
-            </span>
-            <span
-              className="block h-3.5 w-px"
-              style={{ background: "rgba(255,255,255,0.1)" }}
-            />
-            <span className="flex items-center gap-1.5">
-              <Code2 size={12} style={{ color: "rgba(124,106,247,0.65)" }} />
-              Python in browser
-            </span>
-            <span
-              className="block h-3.5 w-px"
-              style={{ background: "rgba(255,255,255,0.1)" }}
-            />
-            <span className="flex items-center gap-1.5">
-              <Zap size={12} style={{ color: "rgba(245,158,11,0.65)" }} />
-              {MAX_XP} XP total
-            </span>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── Divider ────────────────────────────────────────────── */}
-      <div style={{ height: "1px", background: "rgba(255,255,255,0.05)" }} />
-
-      {/* ── Modules section ─────────────────────────────────────── */}
-      <section className="max-w-5xl mx-auto px-6" style={{ padding: "80px 24px" }}>
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.15 }}
-          className="mb-10"
         >
-          <p
-            className="font-mono uppercase mb-3"
-            style={{ fontSize: "10px", letterSpacing: "0.14em", color: "rgba(255,255,255,0.28)" }}
-          >
-            Curriculum
-          </p>
-          <h2
-            className="font-display font-bold"
+          <div
             style={{
-              fontSize: "clamp(1.5rem, 3vw, 2.2rem)",
-              letterSpacing: "-0.03em",
-              color: "rgba(255,255,255,0.92)",
+              display: "flex",
+              alignItems: "center",
+              gap: "5px",
+              fontFamily: "var(--font-mono)",
+              fontSize: "11px",
+              color: "var(--color-text-tertiary)",
             }}
           >
-            Eight modules. Every algorithm that matters.
-          </h2>
-        </motion.div>
+            <span>Module 1</span>
+            <span>&nbsp;/&nbsp;</span>
+            <span style={{ color: "var(--color-text-secondary)" }}>Vectors &amp; Embeddings</span>
+            <span>&nbsp;/&nbsp;</span>
+            <span style={{ color: "var(--color-text-secondary)" }}>Ch 1.2</span>
+          </div>
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "4px",
+              padding: "3px 10px",
+              background: "rgba(245,158,11,0.1)",
+              border: "1px solid rgba(245,158,11,0.25)",
+              borderRadius: "100px",
+              fontFamily: "var(--font-mono)",
+              fontSize: "11px",
+              fontWeight: 700,
+              color: "var(--color-xp)",
+            }}
+          >
+            ⚡ +75 XP
+          </div>
+        </div>
 
-        <div className="grid grid-cols-4 gap-3" style={{ gridTemplateRows: "auto auto" }}>
-          {MODULES.map((m, i) => (
-            <ModuleTile key={m.id} module={m} index={i} />
+        {/* Title block */}
+        <div style={{ padding: "16px 16px 0" }}>
+          <h4
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "15px",
+              fontWeight: 700,
+              color: "var(--color-text-primary)",
+              marginBottom: "4px",
+            }}
+          >
+            Cosine Similarity Search
+          </h4>
+          <p
+            style={{
+              fontSize: "12px",
+              color: "var(--color-text-secondary)",
+              lineHeight: 1.5,
+              marginBottom: "14px",
+            }}
+          >
+            Core to every embedding-based retrieval system — semantic search, RAG pipelines,
+            recommendation engines.
+          </p>
+        </div>
+
+        {/* Code block */}
+        <div
+          style={{
+            background: "#080a11",
+            borderTop: "1px solid var(--color-border-subtle)",
+            borderBottom: "1px solid var(--color-border-subtle)",
+            fontFamily: "var(--font-mono)",
+            fontSize: "12.5px",
+            lineHeight: 1.75,
+            padding: "14px 0",
+          }}
+        >
+          {[
+            [<><span style={{ color: "#c792ea" }}>import</span> numpy <span style={{ color: "#c792ea" }}>as</span> np</>, "1"],
+            [<>&nbsp;</>, "2"],
+            [<><span style={{ color: "#c792ea" }}>def</span> <span style={{ color: "#22d3ee" }}>cosine_similarity</span>(<span style={{ color: "#f78c6c" }}>a</span>: np.ndarray, <span style={{ color: "#f78c6c" }}>b</span>: np.ndarray) -&gt; <span style={{ color: "#9585ff" }}>float</span>:</>, "3"],
+            [<>&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: "#445060", fontStyle: "italic" }}># Embedding retrieval: find nearest neighbor</span></>, "4"],
+            [<>&nbsp;&nbsp;&nbsp;&nbsp;dot = np.<span style={{ color: "#22d3ee" }}>dot</span>(<span style={{ color: "#f78c6c" }}>a</span>, <span style={{ color: "#f78c6c" }}>b</span>)</>, "5"],
+            [<>&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: "#c792ea" }}>return</span> dot / (np.<span style={{ color: "#22d3ee" }}>linalg</span>.<span style={{ color: "#22d3ee" }}>norm</span>(<span style={{ color: "#f78c6c" }}>a</span>) * np.<span style={{ color: "#22d3ee" }}>linalg</span>.<span style={{ color: "#22d3ee" }}>norm</span>(<span style={{ color: "#f78c6c" }}>b</span>))</>, "6"],
+          ].map(([code, ln], i) => (
+            <div key={i} style={{ display: "flex", padding: "0 14px" }}>
+              <span
+                style={{
+                  color: "var(--color-text-tertiary)",
+                  width: "20px",
+                  textAlign: "right",
+                  marginRight: "14px",
+                  flexShrink: 0,
+                  userSelect: "none",
+                }}
+              >
+                {ln}
+              </span>
+              <span style={{ flex: 1 }}>{code}</span>
+            </div>
           ))}
         </div>
+
+        {/* Run bar */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "10px 16px",
+            background: "var(--color-bg-elevated)",
+          }}
+        >
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--color-text-tertiary)" }}>
+            ⌘ Enter to run
+          </span>
+          <button
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "5px 14px",
+              background: "var(--color-accent)",
+              color: "#fff",
+              borderRadius: "6px",
+              border: "none",
+              fontFamily: "var(--font-sans)",
+              fontSize: "12px",
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            ▶ Run Tests
+          </button>
+        </div>
+
+        {/* Test results */}
+        <div style={{ padding: "12px 16px", display: "flex", flexDirection: "column", gap: "8px" }}>
+          {[
+            ["identical vectors → ", "1.0"],
+            ["orthogonal vectors → ", "0.0"],
+            ["nearest neighbor search: ", "correct"],
+            ["10 k embeddings searched in ", "18 ms"],
+          ].map(([label, val], i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: "9px", fontFamily: "var(--font-mono)", fontSize: "12px" }}>
+              <div
+                style={{
+                  width: "17px",
+                  height: "17px",
+                  borderRadius: "50%",
+                  flexShrink: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: "rgba(16,185,129,0.15)",
+                  color: "var(--color-success)",
+                  fontSize: "9px",
+                }}
+              >
+                ✓
+              </div>
+              <span style={{ color: "var(--color-text-secondary)" }}>
+                {label}<em style={{ fontStyle: "normal", color: "var(--color-text-primary)" }}>{val}</em>
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* XP banner */}
+        <div
+          style={{
+            margin: "4px 16px 14px",
+            padding: "9px 14px",
+            background: "rgba(245,158,11,0.07)",
+            border: "1px solid rgba(245,158,11,0.18)",
+            borderRadius: "8px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+            fontFamily: "var(--font-mono)",
+            fontSize: "12px",
+            fontWeight: 700,
+            color: "var(--color-xp)",
+          }}
+        >
+          ⚡ All tests passed — +75 XP earned
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// ─── Landing page ──────────────────────────────────────────────────────────
+function LandingPage() {
+  const { signInWithGoogle } = useAuth();
+  const curriculumRef = useRef<HTMLElement>(null);
+
+  function scrollToCurriculum() {
+    curriculumRef.current?.scrollIntoView({ behavior: "smooth" });
+  }
+
+  return (
+    <div style={{ background: "var(--color-bg)" }}>
+
+      {/* ── HERO ─────────────────────────────────────────────────────────── */}
+      <section
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          padding: "100px 48px 80px",
+          position: "relative",
+          overflow: "hidden",
+          backgroundImage: `
+            radial-gradient(circle at 70% 40%, rgba(124,106,247,0.10) 0%, transparent 55%),
+            radial-gradient(circle at 20% 80%, rgba(34,211,238,0.05) 0%, transparent 50%)
+          `,
+        }}
+      >
+        {/* Dot grid */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage: "radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)",
+            backgroundSize: "32px 32px",
+            pointerEvents: "none",
+          }}
+        />
+
+        <div
+          style={{
+            maxWidth: "1240px",
+            margin: "0 auto",
+            width: "100%",
+            display: "grid",
+            gridTemplateColumns: "1fr 520px",
+            gap: "72px",
+            alignItems: "center",
+            position: "relative",
+          }}
+        >
+          {/* Left: headline */}
+          <div>
+            {/* Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45 }}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "5px 14px",
+                background: "rgba(124,106,247,0.1)",
+                border: "1px solid rgba(124,106,247,0.3)",
+                borderRadius: "100px",
+                fontSize: "12px",
+                fontWeight: 600,
+                color: "var(--color-accent)",
+                marginBottom: "28px",
+              }}
+            >
+              <motion.span
+                animate={{ opacity: [1, 0.3, 1] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                style={{
+                  width: "6px",
+                  height: "6px",
+                  background: "var(--color-accent)",
+                  borderRadius: "50%",
+                  display: "inline-block",
+                }}
+              />
+              Python in the browser · No installs · XP-gated progression
+            </motion.div>
+
+            {/* H1 */}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.07, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(2.8rem, 5vw, 4.25rem)",
+                fontWeight: 800,
+                lineHeight: 1.03,
+                letterSpacing: "-0.035em",
+                marginBottom: "24px",
+              }}
+            >
+              The algorithms<br />
+              powering{" "}
+              <span
+                style={{
+                  background: "linear-gradient(120deg, var(--color-accent) 0%, var(--color-cyan) 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                AI.
+              </span>
+              <br />
+              Finally, a course<br />
+              that shows you why.
+            </motion.h1>
+
+            {/* Subtext */}
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.14 }}
+              style={{
+                fontSize: "18px",
+                lineHeight: 1.7,
+                color: "var(--color-text-secondary)",
+                maxWidth: "480px",
+                marginBottom: "40px",
+              }}
+            >
+              Not &ldquo;implement a hash map&rdquo; —{" "}
+              <strong style={{ color: "var(--color-text-primary)", fontWeight: 600 }}>
+                &ldquo;build the token lookup table that powers a tokenizer.&rdquo;
+              </strong>{" "}
+              Every algorithm is taught through the AI system where it actually lives.
+            </motion.p>
+
+            {/* CTAs */}
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.2 }}
+              style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "52px" }}
+            >
+              <button
+                onClick={signInWithGoogle}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "14px 28px",
+                  borderRadius: "10px",
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "15px",
+                  fontWeight: 600,
+                  background: "var(--color-accent)",
+                  color: "#fff",
+                  border: "none",
+                  cursor: "pointer",
+                  boxShadow: "0 0 24px rgba(124,106,247,0.35)",
+                  transition: "all 0.18s",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = "var(--color-accent-hover)";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "0 0 36px rgba(124,106,247,0.5)";
+                  (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = "var(--color-accent)";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "0 0 24px rgba(124,106,247,0.35)";
+                  (e.currentTarget as HTMLElement).style.transform = "";
+                }}
+              >
+                Start Learning Free &nbsp;→
+              </button>
+              <button
+                onClick={scrollToCurriculum}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "14px 28px",
+                  borderRadius: "10px",
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "15px",
+                  fontWeight: 600,
+                  background: "transparent",
+                  color: "var(--color-text-secondary)",
+                  border: "1px solid var(--color-border)",
+                  cursor: "pointer",
+                  transition: "all 0.18s",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = "var(--color-bg-card)";
+                  (e.currentTarget as HTMLElement).style.color = "var(--color-text-primary)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = "transparent";
+                  (e.currentTarget as HTMLElement).style.color = "var(--color-text-secondary)";
+                }}
+              >
+                Browse Curriculum
+              </button>
+            </motion.div>
+
+            {/* Metrics */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              style={{ display: "flex", alignItems: "center" }}
+            >
+              {[
+                { val: "8", label: "modules" },
+                { val: "24", label: "challenges" },
+                { val: "2,500", label: "total XP" },
+                { val: "< 6h", label: "to complete" },
+              ].map((m, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "2px",
+                    paddingRight: i < 3 ? "28px" : 0,
+                    marginRight: i < 3 ? "28px" : 0,
+                    borderRight: i < 3 ? "1px solid var(--color-border)" : "none",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      fontSize: "26px",
+                      fontWeight: 800,
+                      color: "var(--color-text-primary)",
+                      lineHeight: 1,
+                    }}
+                  >
+                    {m.val}
+                  </span>
+                  <span style={{ fontSize: "12px", color: "var(--color-text-secondary)" }}>
+                    {m.label}
+                  </span>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* Right: challenge card */}
+          <motion.div
+            initial={{ opacity: 0, x: 32 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <ChallengeCardMockup />
+          </motion.div>
+        </div>
       </section>
 
-      {/* ── Divider ────────────────────────────────────────────── */}
-      <div style={{ height: "1px", background: "rgba(255,255,255,0.05)" }} />
-
-      {/* ── Feature strip ───────────────────────────────────────── */}
-      <section className="max-w-5xl mx-auto" style={{ padding: "72px 24px" }}>
-        <div className="grid grid-cols-3 gap-px" style={{ border: "1px solid rgba(255,255,255,0.05)", borderRadius: "16px", overflow: "hidden" }}>
+      {/* ── STATS BAR ────────────────────────────────────────────────────── */}
+      <div
+        style={{
+          background: "var(--color-bg-secondary)",
+          borderTop: "1px solid var(--color-border-subtle)",
+          borderBottom: "1px solid var(--color-border-subtle)",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: "1240px",
+            margin: "0 auto",
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+          }}
+        >
           {[
-            {
-              Icon: Code2,
-              title: "Python runs here",
-              desc: "Pyodide WASM runtime. No installs, no servers. Your code executes instantly in the browser.",
-              color: "#7c6af7",
-            },
-            {
-              Icon: Cpu,
-              title: "Every algo in AI context",
-              desc: "Hash tables power embedding lookups. Trees structure RAG. You'll understand the why, not just the how.",
-              color: "#22d3ee",
-            },
-            {
-              Icon: Zap,
-              title: "XP-gated progression",
-              desc: "Complete challenges to unlock the next module. Mastery gates advancement — no skipping ahead.",
-              color: "#f59e0b",
-            },
-          ].map(({ Icon, title, desc, color }, i) => (
-            <motion.div
-              key={title}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 + i * 0.08 }}
-              className="p-8"
-              style={{ background: "rgba(255,255,255,0.015)" }}
+            { n: "8", label: "focused modules", color: "var(--color-accent)" },
+            { n: "24", label: "coding challenges", color: "var(--color-text-primary)" },
+            { n: "2,500", label: "total XP to earn", color: "var(--color-xp)" },
+            { n: "< 6 hrs", label: "to complete the course", color: "var(--color-cyan)" },
+          ].map((s, i) => (
+            <FadeIn
+              key={i}
+              delay={i * 0.07}
             >
               <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center mb-5"
-                style={{ background: `${color}14`, color }}
+                style={{
+                  padding: "36px 48px",
+                  borderRight: i < 3 ? "1px solid var(--color-border-subtle)" : "none",
+                }}
               >
-                <Icon size={16} />
+                <div
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontSize: "42px",
+                    fontWeight: 800,
+                    lineHeight: 1,
+                    marginBottom: "6px",
+                    color: s.color,
+                  }}
+                >
+                  {s.n}
+                </div>
+                <div style={{ fontSize: "14px", color: "var(--color-text-secondary)" }}>
+                  {s.label}
+                </div>
               </div>
-              <h3
-                className="font-semibold mb-2"
-                style={{ fontSize: "14px", color: "rgba(255,255,255,0.88)", letterSpacing: "-0.01em" }}
-              >
-                {title}
-              </h3>
-              <p style={{ fontSize: "13px", lineHeight: "1.6", color: "rgba(255,255,255,0.38)" }}>
-                {desc}
-              </p>
-            </motion.div>
+            </FadeIn>
           ))}
+        </div>
+      </div>
+
+      {/* ── REFRAME ──────────────────────────────────────────────────────── */}
+      <section style={{ padding: "100px 48px" }}>
+        <div style={{ maxWidth: "1240px", margin: "0 auto" }}>
+          <FadeIn>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                fontSize: "11px",
+                fontWeight: 700,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "var(--color-accent)",
+                marginBottom: "16px",
+              }}
+            >
+              <span style={{ width: "14px", height: "2px", background: "var(--color-accent)", display: "inline-block" }} />
+              The difference
+            </div>
+          </FadeIn>
+          <FadeIn delay={0.08}>
+            <h2
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(2rem, 4vw, 3rem)",
+                fontWeight: 800,
+                lineHeight: 1.08,
+                letterSpacing: "-0.025em",
+                marginBottom: "14px",
+              }}
+            >
+              Not textbook DSA.<br />AI engineering DSA.
+            </h2>
+          </FadeIn>
+          <FadeIn delay={0.14}>
+            <p style={{ fontSize: "17px", color: "var(--color-text-secondary)", lineHeight: 1.65, maxWidth: "540px" }}>
+              Every algorithm is grounded in where it actually lives — in production AI systems you can name.
+            </p>
+          </FadeIn>
+
+          <div style={{ marginTop: "56px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+            {/* Traditional */}
+            <FadeIn delay={0.1}>
+              <div
+                style={{
+                  background: "var(--color-bg-card)",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "16px",
+                  padding: "32px",
+                  height: "100%",
+                }}
+              >
+                <span
+                  style={{
+                    display: "inline-block",
+                    padding: "4px 12px",
+                    borderRadius: "100px",
+                    fontSize: "10px",
+                    fontWeight: 700,
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    marginBottom: "24px",
+                    background: "rgba(52,61,79,0.5)",
+                    color: "var(--color-text-tertiary)",
+                  }}
+                >
+                  Traditional DSA course
+                </span>
+                <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "14px" }}>
+                  {[
+                    "\"Implement a hash map from scratch\"",
+                    "\"Sort this array of integers\"",
+                    "\"Traverse a binary tree in-order\"",
+                    "\"Find the shortest path in a graph\"",
+                    "\"Compute edit distance between strings\"",
+                  ].map((item, i) => (
+                    <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: "12px", fontSize: "14px", lineHeight: 1.55, color: "var(--color-text-tertiary)" }}>
+                      <div
+                        style={{
+                          width: "20px",
+                          height: "20px",
+                          borderRadius: "50%",
+                          flexShrink: 0,
+                          marginTop: "1px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          background: "var(--color-text-tertiary)",
+                          color: "#09090e",
+                          fontSize: "10px",
+                          fontWeight: 700,
+                        }}
+                      >
+                        ✕
+                      </div>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </FadeIn>
+
+            {/* DSA for AI */}
+            <FadeIn delay={0.18}>
+              <div
+                style={{
+                  background: "var(--color-bg-card)",
+                  border: "1px solid rgba(124,106,247,0.25)",
+                  borderRadius: "16px",
+                  padding: "32px",
+                  height: "100%",
+                }}
+              >
+                <span
+                  style={{
+                    display: "inline-block",
+                    padding: "4px 12px",
+                    borderRadius: "100px",
+                    fontSize: "10px",
+                    fontWeight: 700,
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    marginBottom: "24px",
+                    background: "rgba(124,106,247,0.12)",
+                    border: "1px solid rgba(124,106,247,0.3)",
+                    color: "var(--color-accent)",
+                  }}
+                >
+                  DSA for AI
+                </span>
+                <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "14px" }}>
+                  {[
+                    "Build the token lookup table that powers a tokenizer",
+                    "Implement quickselect to rank beam search candidates",
+                    "Build a decision tree that classifies embeddings",
+                    "Run BFS on a knowledge graph for multi-hop reasoning",
+                    "Use edit distance for fuzzy matching in RAG retrieval",
+                  ].map((item, i) => (
+                    <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: "12px", fontSize: "14px", lineHeight: 1.55, color: "var(--color-text-primary)" }}>
+                      <div
+                        style={{
+                          width: "20px",
+                          height: "20px",
+                          borderRadius: "50%",
+                          flexShrink: 0,
+                          marginTop: "1px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          background: "var(--color-accent)",
+                          color: "#fff",
+                          fontSize: "10px",
+                          fontWeight: 700,
+                        }}
+                      >
+                        ✓
+                      </div>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </FadeIn>
+          </div>
         </div>
       </section>
 
-      {/* ── Footer ──────────────────────────────────────────────── */}
-      <div style={{ height: "1px", background: "rgba(255,255,255,0.05)" }} />
-      <div className="flex items-center justify-center" style={{ padding: "28px 24px" }}>
-        <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.2)" }}>
-          DSA for AI Engineering
+      {/* ── CURRICULUM ───────────────────────────────────────────────────── */}
+      <section
+        ref={curriculumRef}
+        id="curriculum"
+        style={{ padding: "100px 48px", background: "var(--color-bg-secondary)" }}
+      >
+        <div style={{ maxWidth: "1240px", margin: "0 auto" }}>
+          <FadeIn>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                fontSize: "11px",
+                fontWeight: 700,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "var(--color-accent)",
+                marginBottom: "16px",
+              }}
+            >
+              <span style={{ width: "14px", height: "2px", background: "var(--color-accent)", display: "inline-block" }} />
+              Curriculum
+            </div>
+          </FadeIn>
+          <FadeIn delay={0.08}>
+            <h2
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(2rem, 4vw, 3rem)",
+                fontWeight: 800,
+                lineHeight: 1.08,
+                letterSpacing: "-0.025em",
+                marginBottom: "14px",
+              }}
+            >
+              8 modules. Zero filler.
+            </h2>
+          </FadeIn>
+          <FadeIn delay={0.14}>
+            <p style={{ fontSize: "17px", color: "var(--color-text-secondary)", lineHeight: 1.65, maxWidth: "540px" }}>
+              Sequential, XP-gated. Each module unlocks the next. Complete the course in one focused sitting.
+            </p>
+          </FadeIn>
+
+          <div
+            style={{
+              marginTop: "56px",
+              display: "grid",
+              gridTemplateColumns: "repeat(4, 1fr)",
+              gap: "14px",
+            }}
+          >
+            {MODULES.map((mod, i) => {
+              const Icon = ICONS[mod.icon] ?? Layers;
+              const color = MODULE_COLORS[i] ?? "var(--color-accent)";
+              return (
+                <FadeIn key={mod.id} delay={0.05 + (i % 4) * 0.07}>
+                  <div
+                    style={{
+                      background: "var(--color-bg-card)",
+                      border: "1px solid var(--color-border)",
+                      borderRadius: "14px",
+                      padding: "22px",
+                      cursor: "default",
+                      transition: "background 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s",
+                      position: "relative",
+                      overflow: "hidden",
+                      height: "100%",
+                    }}
+                    onMouseEnter={(e) => {
+                      const el = e.currentTarget as HTMLElement;
+                      el.style.background = "var(--color-bg-card-hover)";
+                      el.style.borderColor = "rgba(124,106,247,0.4)";
+                      el.style.transform = "translateY(-3px)";
+                      el.style.boxShadow = "0 16px 40px rgba(0,0,0,0.5)";
+                      const bar = el.querySelector(".mod-bar") as HTMLElement | null;
+                      if (bar) bar.style.opacity = "1";
+                    }}
+                    onMouseLeave={(e) => {
+                      const el = e.currentTarget as HTMLElement;
+                      el.style.background = "var(--color-bg-card)";
+                      el.style.borderColor = "var(--color-border)";
+                      el.style.transform = "";
+                      el.style.boxShadow = "";
+                      const bar = el.querySelector(".mod-bar") as HTMLElement | null;
+                      if (bar) bar.style.opacity = "0";
+                    }}
+                  >
+                    {/* Top accent bar */}
+                    <div
+                      className="mod-bar"
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: "2px",
+                        background: "linear-gradient(90deg, var(--color-accent), var(--color-cyan))",
+                        opacity: 0,
+                        transition: "opacity 0.2s",
+                      }}
+                    />
+                    <div
+                      style={{
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "10px",
+                        fontWeight: 600,
+                        color: "var(--color-text-tertiary)",
+                        marginBottom: "14px",
+                      }}
+                    >
+                      {String(mod.order + 1).padStart(2, "0")}
+                    </div>
+                    <div
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        borderRadius: "10px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        marginBottom: "14px",
+                        background: `${color}1a`,
+                        color,
+                      }}
+                    >
+                      <Icon size={18} />
+                    </div>
+                    <div
+                      style={{
+                        fontFamily: "var(--font-display)",
+                        fontSize: "15px",
+                        fontWeight: 700,
+                        color: "var(--color-text-primary)",
+                        lineHeight: 1.3,
+                        marginBottom: "8px",
+                      }}
+                    >
+                      {mod.title}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "12px",
+                        color: "var(--color-text-secondary)",
+                        lineHeight: 1.55,
+                        marginBottom: "18px",
+                      }}
+                    >
+                      {mod.description}
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        paddingTop: "14px",
+                        borderTop: "1px solid var(--color-border-subtle)",
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "11px",
+                      }}
+                    >
+                      <span style={{ color: "var(--color-text-secondary)" }}>
+                        {mod.challenges.length} challenges
+                      </span>
+                      <span style={{ color: "var(--color-text-tertiary)" }}>
+                        {mod.estimatedMinutes} min
+                      </span>
+                    </div>
+                  </div>
+                </FadeIn>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── HOW IT WORKS ─────────────────────────────────────────────────── */}
+      <section id="how" style={{ padding: "100px 48px" }}>
+        <div style={{ maxWidth: "1240px", margin: "0 auto" }}>
+          <FadeIn>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                fontSize: "11px",
+                fontWeight: 700,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "var(--color-accent)",
+                marginBottom: "16px",
+              }}
+            >
+              <span style={{ width: "14px", height: "2px", background: "var(--color-accent)", display: "inline-block" }} />
+              How it works
+            </div>
+          </FadeIn>
+          <FadeIn delay={0.08}>
+            <h2
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(2rem, 4vw, 3rem)",
+                fontWeight: 800,
+                lineHeight: 1.08,
+                letterSpacing: "-0.025em",
+                marginBottom: "14px",
+              }}
+            >
+              Write code.<br />See it run. Earn XP.
+            </h2>
+          </FadeIn>
+          <FadeIn delay={0.14}>
+            <p style={{ fontSize: "17px", color: "var(--color-text-secondary)", lineHeight: 1.65, maxWidth: "540px" }}>
+              No installs, no environment setup — open a tab and start coding immediately.
+            </p>
+          </FadeIn>
+
+          <div style={{ marginTop: "64px", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "40px" }}>
+            {[
+              {
+                n: "01",
+                title: "Read the AI framing",
+                desc: "Each challenge opens with the real AI system it connects to. You understand why the algorithm matters before you write a single line.",
+              },
+              {
+                n: "02",
+                title: "Write Python in the browser",
+                desc: (
+                  <>
+                    A full Python runtime (<code style={{ fontFamily: "var(--font-mono)", fontSize: "13px", background: "var(--color-bg-card)", border: "1px solid var(--color-border)", borderRadius: "4px", padding: "1px 6px", color: "var(--color-cyan)" }}>Pyodide WASM</code>) runs directly in your tab. No notebooks, no terminal — just a code editor and instant feedback.
+                  </>
+                ),
+              },
+              {
+                n: "03",
+                title: "Pass tests. Earn XP. Unlock next.",
+                desc: "Tests run in milliseconds. Pass all tests to earn XP and unlock the next challenge. Your mastery is tracked across all 8 modules.",
+              },
+            ].map((step, i) => (
+              <FadeIn key={i} delay={0.05 + i * 0.1}>
+                <div>
+                  <div
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      fontSize: "80px",
+                      fontWeight: 900,
+                      lineHeight: 1,
+                      color: "var(--color-border)",
+                      marginBottom: "20px",
+                      letterSpacing: "-0.04em",
+                    }}
+                  >
+                    {step.n}
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      fontSize: "22px",
+                      fontWeight: 700,
+                      color: "var(--color-text-primary)",
+                      marginBottom: "12px",
+                    }}
+                  >
+                    {step.title}
+                  </div>
+                  <p style={{ fontSize: "15px", color: "var(--color-text-secondary)", lineHeight: 1.7 }}>
+                    {step.desc}
+                  </p>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA ──────────────────────────────────────────────────────────── */}
+      <section
+        style={{
+          padding: "120px 48px",
+          textAlign: "center",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "900px",
+            height: "500px",
+            background: "radial-gradient(ellipse, rgba(124,106,247,0.11) 0%, transparent 65%)",
+            pointerEvents: "none",
+          }}
+        />
+        <div style={{ maxWidth: "620px", margin: "0 auto", position: "relative" }}>
+          <FadeIn>
+            <h2
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(2.2rem, 4.5vw, 3.5rem)",
+                fontWeight: 800,
+                lineHeight: 1.07,
+                letterSpacing: "-0.025em",
+                marginBottom: "18px",
+              }}
+            >
+              Start building.<br />
+              <span
+                style={{
+                  background: "linear-gradient(120deg, var(--color-accent) 0%, var(--color-cyan) 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                In under 6 hours.
+              </span>
+            </h2>
+          </FadeIn>
+          <FadeIn delay={0.08}>
+            <p style={{ fontSize: "17px", color: "var(--color-text-secondary)", lineHeight: 1.6, marginBottom: "40px" }}>
+              24 real coding challenges. Python in your browser. Algorithms that actually matter for AI engineering.
+            </p>
+          </FadeIn>
+          <FadeIn delay={0.14}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "14px" }}>
+              <button
+                onClick={signInWithGoogle}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "14px 28px",
+                  borderRadius: "10px",
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "15px",
+                  fontWeight: 600,
+                  background: "var(--color-accent)",
+                  color: "#fff",
+                  border: "none",
+                  cursor: "pointer",
+                  boxShadow: "0 0 24px rgba(124,106,247,0.35)",
+                  transition: "all 0.18s",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = "var(--color-accent-hover)";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "0 0 36px rgba(124,106,247,0.5)";
+                  (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = "var(--color-accent)";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "0 0 24px rgba(124,106,247,0.35)";
+                  (e.currentTarget as HTMLElement).style.transform = "";
+                }}
+              >
+                Start Learning Free &nbsp;→
+              </button>
+              <button
+                onClick={scrollToCurriculum}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "14px 28px",
+                  borderRadius: "10px",
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "15px",
+                  fontWeight: 600,
+                  background: "transparent",
+                  color: "var(--color-text-secondary)",
+                  border: "1px solid var(--color-border)",
+                  cursor: "pointer",
+                  transition: "all 0.18s",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = "var(--color-bg-card)";
+                  (e.currentTarget as HTMLElement).style.color = "var(--color-text-primary)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = "transparent";
+                  (e.currentTarget as HTMLElement).style.color = "var(--color-text-secondary)";
+                }}
+              >
+                Browse Curriculum
+              </button>
+            </div>
+          </FadeIn>
+          <FadeIn delay={0.2}>
+            <p style={{ marginTop: "20px", fontSize: "12px", color: "var(--color-text-tertiary)" }}>
+              No account required to try. Sign in with Google to save progress.
+            </p>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* ── FOOTER ───────────────────────────────────────────────────────── */}
+      <footer
+        style={{
+          background: "var(--color-bg-secondary)",
+          borderTop: "1px solid var(--color-border-subtle)",
+          padding: "28px 48px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            fontFamily: "var(--font-display)",
+            fontWeight: 700,
+            fontSize: "15px",
+          }}
+        >
+          <div
+            style={{
+              width: "30px",
+              height: "30px",
+              background: "var(--color-accent)",
+              borderRadius: "7px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "15px",
+              fontWeight: 800,
+              color: "#fff",
+              fontFamily: "var(--font-mono)",
+            }}
+          >
+            Σ
+          </div>
+          DSA for AI
+        </div>
+        <p style={{ fontSize: "12px", color: "var(--color-text-tertiary)" }}>
+          A focused, challenge-driven course for AI engineers. &copy; 2026
         </p>
-      </div>
+      </footer>
     </div>
   );
 }

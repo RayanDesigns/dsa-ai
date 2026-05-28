@@ -5,10 +5,13 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { useProgressStore } from "@/store/progress";
 import { XPBar } from "@/components/gamification/XPBar";
 import { LogOut } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export function Navbar() {
-  const { user, signOutUser } = useAuth();
+  const { user, signOutUser, signInWithGoogle } = useAuth();
   const progress = useProgressStore((s) => s.progress);
+  const pathname = usePathname();
+  const isLanding = pathname === "/" && !user;
 
   return (
     <nav
@@ -58,10 +61,111 @@ export function Navbar() {
           </div>
         </Link>
 
+        {/* Nav links — landing page only */}
+        {isLanding && (
+          <ul style={{ display: "flex", alignItems: "center", gap: "32px", listStyle: "none", margin: 0, padding: 0 }}>
+            <li>
+              <a
+                href="#curriculum"
+                style={{
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  color: "var(--color-text-secondary)",
+                  textDecoration: "none",
+                  transition: "color 0.15s",
+                }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--color-text-primary)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--color-text-secondary)"; }}
+              >
+                Curriculum
+              </a>
+            </li>
+            <li>
+              <a
+                href="#how"
+                style={{
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  color: "var(--color-text-secondary)",
+                  textDecoration: "none",
+                  transition: "color 0.15s",
+                }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--color-text-primary)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--color-text-secondary)"; }}
+              >
+                How it works
+              </a>
+            </li>
+          </ul>
+        )}
+
         {/* XP bar (center) */}
-        {progress && (
+        {progress && !isLanding && (
           <div className="hidden sm:flex">
             <XPBar xp={progress.totalXP} />
+          </div>
+        )}
+
+        {/* Landing CTA buttons */}
+        {isLanding && (
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <button
+              onClick={signInWithGoogle}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "7px 16px",
+                borderRadius: "8px",
+                fontFamily: "var(--font-sans)",
+                fontSize: "13.5px",
+                fontWeight: 600,
+                background: "transparent",
+                color: "var(--color-text-secondary)",
+                border: "1px solid var(--color-border)",
+                cursor: "pointer",
+                transition: "all 0.15s",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.background = "var(--color-bg-card)";
+                (e.currentTarget as HTMLElement).style.color = "var(--color-text-primary)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.background = "transparent";
+                (e.currentTarget as HTMLElement).style.color = "var(--color-text-secondary)";
+              }}
+            >
+              Sign in
+            </button>
+            <button
+              onClick={signInWithGoogle}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "7px 16px",
+                borderRadius: "8px",
+                fontFamily: "var(--font-sans)",
+                fontSize: "13.5px",
+                fontWeight: 600,
+                background: "var(--color-accent)",
+                color: "#fff",
+                border: "none",
+                cursor: "pointer",
+                boxShadow: "0 0 20px rgba(124,106,247,0.3)",
+                transition: "all 0.15s",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.background = "var(--color-accent-hover)";
+                (e.currentTarget as HTMLElement).style.boxShadow = "0 0 28px rgba(124,106,247,0.45)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.background = "var(--color-accent)";
+                (e.currentTarget as HTMLElement).style.boxShadow = "0 0 20px rgba(124,106,247,0.3)";
+              }}
+            >
+              Start for free
+            </button>
           </div>
         )}
 
