@@ -6,7 +6,7 @@ import type * as MonacoType from "monaco-editor";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
-const THEME_ID = "dsa-violet";
+const THEME_ID = "dsa-dark";
 
 function applyTheme(monaco: typeof MonacoType) {
   monaco.editor.defineTheme(THEME_ID, {
@@ -36,34 +36,34 @@ function applyTheme(monaco: typeof MonacoType) {
     colors: {
       "editor.background":                    "#0b0d14",
       "editor.foreground":                    "#eceef4",
-      "editor.lineHighlightBackground":       "#7c6af708",
-      "editor.lineHighlightBorder":           "#7c6af714",
-      "editor.selectionBackground":           "#7c6af730",
-      "editor.inactiveSelectionBackground":   "#7c6af718",
+      "editor.lineHighlightBackground":       "#ffffff06",
+      "editor.lineHighlightBorder":           "#ffffff0c",
+      "editor.selectionBackground":           "#ffffff1a",
+      "editor.inactiveSelectionBackground":   "#ffffff0d",
       "editorLineNumber.foreground":          "#232b3e",
-      "editorLineNumber.activeForeground":    "#7c6af7",
-      "editorCursor.foreground":              "#7c6af7",
+      "editorLineNumber.activeForeground":    "#7a7a9a",
+      "editorCursor.foreground":              "#ffffff",
       "editorCursor.background":              "#0b0d14",
       "editorWhitespace.foreground":          "#181e2e",
       "editorIndentGuide.background1":        "#181e2e",
-      "editorIndentGuide.activeBackground1":  "#7c6af728",
-      "editor.findMatchBackground":           "#7c6af730",
-      "editor.findMatchHighlightBackground":  "#7c6af718",
-      "editorBracketMatch.background":        "#7c6af718",
-      "editorBracketMatch.border":            "#7c6af755",
+      "editorIndentGuide.activeBackground1":  "#ffffff18",
+      "editor.findMatchBackground":           "#ffffff22",
+      "editor.findMatchHighlightBackground":  "#ffffff12",
+      "editorBracketMatch.background":        "#ffffff12",
+      "editorBracketMatch.border":            "#ffffff35",
       "scrollbar.shadow":                     "#00000080",
       "scrollbarSlider.background":           "#1c203350",
-      "scrollbarSlider.hoverBackground":      "#7c6af728",
-      "scrollbarSlider.activeBackground":     "#7c6af745",
+      "scrollbarSlider.hoverBackground":      "#ffffff18",
+      "scrollbarSlider.activeBackground":     "#ffffff2a",
       "editorWidget.background":              "#0e1020",
       "editorSuggestWidget.background":       "#0e1020",
       "editorSuggestWidget.border":           "#1c2033",
-      "editorSuggestWidget.selectedBackground":"#7c6af720",
+      "editorSuggestWidget.selectedBackground":"#ffffff12",
       "editorHoverWidget.background":         "#0e1020",
       "editorHoverWidget.border":             "#1c2033",
       "input.background":                     "#13161f",
       "input.border":                         "#1c2033",
-      "focusBorder":                          "#7c6af760",
+      "focusBorder":                          "#ffffff40",
     },
   });
 }
@@ -80,6 +80,7 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   automaticLayout: true,
   tabSize: 4,
   insertSpaces: true,
+  detectIndentation: false,
   wordWrap: "on",
   suggestOnTriggerCharacters: true,
   quickSuggestions: true,
@@ -105,12 +106,12 @@ function PythonLogo() {
     <svg width="15" height="15" viewBox="0 0 256 255" aria-hidden="true">
       <defs>
         <linearGradient id="cc-py-a" x1="12.959%" x2="79.639%" y1="12.039%" y2="78.201%">
-          <stop offset="0%" stopColor="#7c6af7" />
-          <stop offset="100%" stopColor="#9585ff" />
+          <stop offset="0%" stopColor="#d0d0d8" />
+          <stop offset="100%" stopColor="#888898" />
         </linearGradient>
         <linearGradient id="cc-py-b" x1="19.128%" x2="90.742%" y1="20.579%" y2="88.429%">
-          <stop offset="0%" stopColor="#9585ff" />
-          <stop offset="100%" stopColor="#c4b5fd" />
+          <stop offset="0%" stopColor="#888898" />
+          <stop offset="100%" stopColor="#606070" />
         </linearGradient>
       </defs>
       <path fill="url(#cc-py-a)" d="M126.916.072c-64.832 0-60.784 28.115-60.784 28.115l.072 29.128h61.868v8.745H41.631S.145 61.355.145 126.77c0 65.413 36.204 63.096 36.204 63.096h21.6v-30.356s-1.165-36.206 35.632-36.206h61.362s34.475.557 34.475-33.319V33.97S194.67.072 126.916.072zM92.802 19.66a11.12 11.12 0 0 1 11.13 11.13 11.12 11.12 0 0 1-11.13 11.13 11.12 11.12 0 0 1-11.13-11.13 11.12 11.12 0 0 1 11.13-11.13z"/>
@@ -146,8 +147,7 @@ export function CodeEditor({ value, onChange, height = "400px" }: Props) {
       style={{
         border: "1px solid #1a1d2e",
         background: "#0b0d14",
-        boxShadow:
-          "0 0 0 1px rgba(124,106,247,0.06), 0 24px 64px rgba(0,0,0,0.55), 0 0 48px rgba(124,106,247,0.03)",
+        boxShadow: "var(--shadow-m)",
       }}
     >
       {/* ── Header ─────────────────────────────────────── */}
@@ -171,7 +171,7 @@ export function CodeEditor({ value, onChange, height = "400px" }: Props) {
           {/* File tab */}
           <div
             className="flex items-center gap-1.5 px-3 py-1 rounded-md"
-            style={{ background: "rgba(124,106,247,0.07)", border: "1px solid rgba(124,106,247,0.14)" }}
+            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)" }}
           >
             <PythonLogo />
             <span className="text-xs font-mono" style={{ color: "#8b8fa8" }}>
@@ -188,17 +188,17 @@ export function CodeEditor({ value, onChange, height = "400px" }: Props) {
           <div
             className="flex items-center gap-1.5 px-2.5 py-1 rounded-md"
             style={{
-              background: "rgba(124,106,247,0.08)",
-              border: "1px solid rgba(124,106,247,0.18)",
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.09)",
             }}
           >
             <span
               className="w-1.5 h-1.5 rounded-full animate-pulse"
-              style={{ background: "#7c6af7", boxShadow: "0 0 6px #7c6af7" }}
+              style={{ background: "#ffffff", boxShadow: "0 0 5px rgba(255,255,255,0.4)" }}
             />
             <span
               className="text-[10px] font-mono font-medium tracking-wider"
-              style={{ color: "#9585ff" }}
+              style={{ color: "#9090a8" }}
             >
               Pyodide · py3.13
             </span>

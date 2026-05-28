@@ -29,7 +29,15 @@ export function checkSafety(code: string): string | null {
   return null;
 }
 
+function normalizeCode(code: string): string {
+  return code
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .replace(/\t/g, "    ");
+}
+
 export function buildHarness(userCode: string, testCases: TestCase[]): string {
+  const normalizedUserCode = normalizeCode(userCode);
   const testBlocks = testCases
     .map(
       (tc) => `
@@ -52,7 +60,7 @@ import io as _io
 _stdout_buf = _io.StringIO()
 _sys.stdout = _stdout_buf
 
-${userCode}
+${normalizedUserCode}
 
 _sys.stdout = _sys.__stdout__
 _captured = _stdout_buf.getvalue()
