@@ -2,17 +2,43 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { useProgressStore } from "@/store/progress";
-import { XPBar } from "@/components/gamification/XPBar";
 import { LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 export function Navbar() {
   const { user, signOutUser, signInWithGoogle } = useAuth();
-  const progress = useProgressStore((s) => s.progress);
   const pathname = usePathname();
   const isLanding = pathname === "/" && !user;
 
+  // Logged in: just avatar + logout, no navbar chrome
+  if (user) {
+    return (
+      <div className="flex justify-end items-center px-4 py-3 max-w-7xl mx-auto">
+        {user.photoURL && (
+          <div
+            className="rounded-full overflow-hidden mr-2"
+            style={{
+              border: "1.5px solid rgba(255,255,255,0.08)",
+              boxShadow: "0 0 0 2px rgba(255,255,255,0.06)",
+            }}
+          >
+            <Image
+              src={user.photoURL}
+              alt={user.displayName ?? ""}
+              width={28}
+              height={28}
+              className="rounded-full block"
+            />
+          </div>
+        )}
+        <button onClick={signOutUser} className="btn-signout" title="Sign out">
+          <LogOut size={15} />
+        </button>
+      </div>
+    );
+  }
+
+  // Logged out: full landing navbar
   return (
     <nav
       className="sticky top-0 z-40"
@@ -61,7 +87,6 @@ export function Navbar() {
           </div>
         </Link>
 
-        {/* Nav links — landing page only */}
         {isLanding && (
           <ul style={{ display: "flex", alignItems: "center", gap: "32px", listStyle: "none", margin: 0, padding: 0 }}>
             <li><a href="#curriculum" className="nav-link">Curriculum</a></li>
@@ -69,50 +94,10 @@ export function Navbar() {
           </ul>
         )}
 
-        {/* XP bar (center) */}
-        {progress && !isLanding && (
-          <div className="hidden sm:flex">
-            <XPBar xp={progress.totalXP} />
-          </div>
-        )}
-
-        {/* Landing CTA buttons */}
-        {isLanding && (
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <button onClick={signInWithGoogle} className="btn-nav-ghost">Sign in</button>
-            <button onClick={signInWithGoogle} className="btn-nav-primary">Start for free</button>
-          </div>
-        )}
-
-        {/* User section */}
-        {user && (
-          <div className="flex items-center gap-2.5">
-            {user.photoURL && (
-              <div
-                className="rounded-full overflow-hidden"
-                style={{
-                  border: "1.5px solid rgba(255,255,255,0.08)",
-                  boxShadow: "0 0 0 2px rgba(255,255,255,0.06)",
-                }}
-              >
-                <Image
-                  src={user.photoURL}
-                  alt={user.displayName ?? ""}
-                  width={28}
-                  height={28}
-                  className="rounded-full block"
-                />
-              </div>
-            )}
-            <button
-              onClick={signOutUser}
-              className="btn-signout"
-              title="Sign out"
-            >
-              <LogOut size={15} />
-            </button>
-          </div>
-        )}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <button onClick={signInWithGoogle} className="btn-nav-ghost">Sign in</button>
+          <button onClick={signInWithGoogle} className="btn-nav-primary">Start for free</button>
+        </div>
       </div>
     </nav>
   );
