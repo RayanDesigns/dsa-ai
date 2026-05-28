@@ -34,7 +34,7 @@ function FadeIn({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
@@ -49,25 +49,25 @@ function FadeIn({
 function ChallengeCardMockup() {
   return (
     <div style={{ position: "relative" }}>
-      {/* Glow behind card */}
+      {/* Ambient glow */}
       <div
         aria-hidden
         style={{
           position: "absolute",
-          inset: "-40px",
-          background: "radial-gradient(ellipse at center, rgba(124,106,247,0.18) 0%, transparent 70%)",
+          inset: "-60px",
+          background: "radial-gradient(ellipse at center, rgba(255,255,255,0.03) 0%, transparent 65%)",
           pointerEvents: "none",
         }}
       />
       <motion.div
-        animate={{ y: [0, -10, 0] }}
-        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        animate={{ y: [0, -8, 0] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         style={{
           background: "var(--color-bg-card)",
           border: "1px solid var(--color-border)",
           borderRadius: "16px",
           overflow: "hidden",
-          boxShadow: "0 0 0 1px rgba(124,106,247,0.12), 0 32px 80px rgba(0,0,0,0.7)",
+          boxShadow: "var(--shadow-l)",
           position: "relative",
         }}
       >
@@ -77,7 +77,7 @@ function ChallengeCardMockup() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "12px 16px",
+            padding: "11px 16px",
             background: "var(--color-bg-elevated)",
             borderBottom: "1px solid var(--color-border-subtle)",
           }}
@@ -93,9 +93,9 @@ function ChallengeCardMockup() {
             }}
           >
             <span>Module 1</span>
-            <span>&nbsp;/&nbsp;</span>
+            <span style={{ opacity: 0.4 }}>&nbsp;/&nbsp;</span>
             <span style={{ color: "var(--color-text-secondary)" }}>Vectors &amp; Embeddings</span>
-            <span>&nbsp;/&nbsp;</span>
+            <span style={{ opacity: 0.4 }}>&nbsp;/&nbsp;</span>
             <span style={{ color: "var(--color-text-secondary)" }}>Ch 1.2</span>
           </div>
           <div
@@ -104,8 +104,8 @@ function ChallengeCardMockup() {
               alignItems: "center",
               gap: "4px",
               padding: "3px 10px",
-              background: "rgba(245,158,11,0.1)",
-              border: "1px solid rgba(245,158,11,0.25)",
+              background: "rgba(245,158,11,0.08)",
+              border: "1px solid rgba(245,158,11,0.2)",
               borderRadius: "100px",
               fontFamily: "var(--font-mono)",
               fontSize: "11px",
@@ -134,7 +134,7 @@ function ChallengeCardMockup() {
             style={{
               fontSize: "12px",
               color: "var(--color-text-secondary)",
-              lineHeight: 1.5,
+              lineHeight: 1.55,
               marginBottom: "14px",
             }}
           >
@@ -146,7 +146,7 @@ function ChallengeCardMockup() {
         {/* Code block */}
         <div
           style={{
-            background: "#080a11",
+            background: "#070910",
             borderTop: "1px solid var(--color-border-subtle)",
             borderBottom: "1px solid var(--color-border-subtle)",
             fontFamily: "var(--font-mono)",
@@ -159,7 +159,7 @@ function ChallengeCardMockup() {
             [<><span style={{ color: "#c792ea" }}>import</span> numpy <span style={{ color: "#c792ea" }}>as</span> np</>, "1"],
             [<>&nbsp;</>, "2"],
             [<><span style={{ color: "#c792ea" }}>def</span> <span style={{ color: "#22d3ee" }}>cosine_similarity</span>(<span style={{ color: "#f78c6c" }}>a</span>: np.ndarray, <span style={{ color: "#f78c6c" }}>b</span>: np.ndarray) -&gt; <span style={{ color: "#9585ff" }}>float</span>:</>, "3"],
-            [<>&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: "#445060", fontStyle: "italic" }}># Embedding retrieval: find nearest neighbor</span></>, "4"],
+            [<>&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: "#3a4560", fontStyle: "italic" }}># Embedding retrieval: find nearest neighbor</span></>, "4"],
             [<>&nbsp;&nbsp;&nbsp;&nbsp;dot = np.<span style={{ color: "#22d3ee" }}>dot</span>(<span style={{ color: "#f78c6c" }}>a</span>, <span style={{ color: "#f78c6c" }}>b</span>)</>, "5"],
             [<>&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: "#c792ea" }}>return</span> dot / (np.<span style={{ color: "#22d3ee" }}>linalg</span>.<span style={{ color: "#22d3ee" }}>norm</span>(<span style={{ color: "#f78c6c" }}>a</span>) * np.<span style={{ color: "#22d3ee" }}>linalg</span>.<span style={{ color: "#22d3ee" }}>norm</span>(<span style={{ color: "#f78c6c" }}>b</span>))</>, "6"],
           ].map(([code, ln], i) => (
@@ -172,6 +172,7 @@ function ChallengeCardMockup() {
                   marginRight: "14px",
                   flexShrink: 0,
                   userSelect: "none",
+                  opacity: 0.5,
                 }}
               >
                 {ln}
@@ -191,7 +192,7 @@ function ChallengeCardMockup() {
             background: "var(--color-bg-elevated)",
           }}
         >
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--color-text-tertiary)" }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--color-text-tertiary)", opacity: 0.7 }}>
             ⌘ Enter to run
           </span>
           <button
@@ -225,16 +226,17 @@ function ChallengeCardMockup() {
             <div key={i} style={{ display: "flex", alignItems: "center", gap: "9px", fontFamily: "var(--font-mono)", fontSize: "12px" }}>
               <div
                 style={{
-                  width: "17px",
-                  height: "17px",
+                  width: "16px",
+                  height: "16px",
                   borderRadius: "50%",
                   flexShrink: 0,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  background: "rgba(16,185,129,0.15)",
+                  background: "rgba(16,185,129,0.12)",
                   color: "var(--color-success)",
                   fontSize: "9px",
+                  fontWeight: 700,
                 }}
               >
                 ✓
@@ -251,8 +253,8 @@ function ChallengeCardMockup() {
           style={{
             margin: "4px 16px 14px",
             padding: "9px 14px",
-            background: "rgba(245,158,11,0.07)",
-            border: "1px solid rgba(245,158,11,0.18)",
+            background: "rgba(245,158,11,0.06)",
+            border: "1px solid rgba(245,158,11,0.15)",
             borderRadius: "8px",
             display: "flex",
             alignItems: "center",
@@ -289,42 +291,27 @@ function LandingPage() {
           minHeight: "100vh",
           display: "flex",
           alignItems: "center",
-          padding: "100px 48px 80px",
+          padding: "120px 48px 100px",
           position: "relative",
           overflow: "hidden",
-          backgroundImage: `
-            radial-gradient(circle at 70% 40%, rgba(124,106,247,0.10) 0%, transparent 55%),
-            radial-gradient(circle at 20% 80%, rgba(34,211,238,0.05) 0%, transparent 50%)
-          `,
+          backgroundImage: `radial-gradient(ellipse 80% 60% at 75% 30%, rgba(255,255,255,0.02) 0%, transparent 60%)`,
         }}
       >
-        {/* Dot grid */}
-        <div
-          aria-hidden
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage: "radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)",
-            backgroundSize: "32px 32px",
-            pointerEvents: "none",
-          }}
-        />
-
         <div
           style={{
             maxWidth: "1240px",
             margin: "0 auto",
             width: "100%",
             display: "grid",
-            gridTemplateColumns: "1fr 520px",
-            gap: "72px",
+            gridTemplateColumns: "1fr 500px",
+            gap: "80px",
             alignItems: "center",
             position: "relative",
           }}
         >
           {/* Left: headline */}
           <div>
-            {/* Badge */}
+            {/* Eyebrow badge */}
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -334,24 +321,25 @@ function LandingPage() {
                 alignItems: "center",
                 gap: "8px",
                 padding: "5px 14px",
-                background: "rgba(124,106,247,0.1)",
-                border: "1px solid rgba(124,106,247,0.3)",
+                background: "rgba(255,255,255,0.05)",
+                border: "1px solid rgba(255,255,255,0.1)",
                 borderRadius: "100px",
                 fontSize: "12px",
                 fontWeight: 600,
-                color: "var(--color-accent)",
-                marginBottom: "28px",
+                color: "var(--color-text-secondary)",
+                marginBottom: "32px",
               }}
             >
               <motion.span
-                animate={{ opacity: [1, 0.3, 1] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                animate={{ opacity: [1, 0.25, 1] }}
+                transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
                 style={{
-                  width: "6px",
-                  height: "6px",
-                  background: "var(--color-accent)",
+                  width: "5px",
+                  height: "5px",
+                  background: "var(--color-text-secondary)",
                   borderRadius: "50%",
                   display: "inline-block",
+                  flexShrink: 0,
                 }}
               />
               Python in the browser · No installs · XP-gated progression
@@ -361,21 +349,21 @@ function LandingPage() {
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.07, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.65, delay: 0.07, ease: [0.22, 1, 0.36, 1] }}
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(2.8rem, 5vw, 4.25rem)",
+                fontSize: "clamp(2.8rem, 4.8vw, 4rem)",
                 fontWeight: 800,
-                lineHeight: 1.03,
+                lineHeight: 1.04,
                 letterSpacing: "-0.035em",
-                marginBottom: "24px",
+                marginBottom: "28px",
               }}
             >
               The algorithms<br />
               powering{" "}
               <span
                 style={{
-                  background: "linear-gradient(120deg, var(--color-accent) 0%, var(--color-cyan) 100%)",
+                  background: "linear-gradient(118deg, #d0d4e4 0%, #707080 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
@@ -384,8 +372,8 @@ function LandingPage() {
                 AI.
               </span>
               <br />
-              Finally, a course<br />
-              that shows you why.
+              Taught through the<br />
+              systems where they live.
             </motion.h1>
 
             {/* Subtext */}
@@ -394,18 +382,17 @@ function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, delay: 0.14 }}
               style={{
-                fontSize: "18px",
-                lineHeight: 1.7,
+                fontSize: "17px",
+                lineHeight: 1.72,
                 color: "var(--color-text-secondary)",
-                maxWidth: "480px",
-                marginBottom: "40px",
+                maxWidth: "460px",
+                marginBottom: "44px",
               }}
             >
-              Not &ldquo;implement a hash map&rdquo; —{" "}
+              Not &ldquo;implement a hash map&rdquo; —&nbsp;
               <strong style={{ color: "var(--color-text-primary)", fontWeight: 600 }}>
                 &ldquo;build the token lookup table that powers a tokenizer.&rdquo;
-              </strong>{" "}
-              Every algorithm is taught through the AI system where it actually lives.
+              </strong>
             </motion.p>
 
             {/* CTAs */}
@@ -413,65 +400,12 @@ function LandingPage() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.2 }}
-              style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "52px" }}
+              style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "56px" }}
             >
-              <button
-                onClick={signInWithGoogle}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  padding: "14px 28px",
-                  borderRadius: "10px",
-                  fontFamily: "var(--font-sans)",
-                  fontSize: "15px",
-                  fontWeight: 600,
-                  background: "var(--color-accent)",
-                  color: "#fff",
-                  border: "none",
-                  cursor: "pointer",
-                  boxShadow: "0 0 24px rgba(124,106,247,0.35)",
-                  transition: "all 0.18s",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "var(--color-accent-hover)";
-                  (e.currentTarget as HTMLElement).style.boxShadow = "0 0 36px rgba(124,106,247,0.5)";
-                  (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "var(--color-accent)";
-                  (e.currentTarget as HTMLElement).style.boxShadow = "0 0 24px rgba(124,106,247,0.35)";
-                  (e.currentTarget as HTMLElement).style.transform = "";
-                }}
-              >
+              <button onClick={signInWithGoogle} className="btn-primary">
                 Start Learning Free &nbsp;→
               </button>
-              <button
-                onClick={scrollToCurriculum}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  padding: "14px 28px",
-                  borderRadius: "10px",
-                  fontFamily: "var(--font-sans)",
-                  fontSize: "15px",
-                  fontWeight: 600,
-                  background: "transparent",
-                  color: "var(--color-text-secondary)",
-                  border: "1px solid var(--color-border)",
-                  cursor: "pointer",
-                  transition: "all 0.18s",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "var(--color-bg-card)";
-                  (e.currentTarget as HTMLElement).style.color = "var(--color-text-primary)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "transparent";
-                  (e.currentTarget as HTMLElement).style.color = "var(--color-text-secondary)";
-                }}
-              >
+              <button onClick={scrollToCurriculum} className="btn-ghost">
                 Browse Curriculum
               </button>
             </motion.div>
@@ -480,7 +414,7 @@ function LandingPage() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
+              transition={{ duration: 0.5, delay: 0.32 }}
               style={{ display: "flex", alignItems: "center" }}
             >
               {[
@@ -494,7 +428,7 @@ function LandingPage() {
                   style={{
                     display: "flex",
                     flexDirection: "column",
-                    gap: "2px",
+                    gap: "3px",
                     paddingRight: i < 3 ? "28px" : 0,
                     marginRight: i < 3 ? "28px" : 0,
                     borderRight: i < 3 ? "1px solid var(--color-border)" : "none",
@@ -503,7 +437,7 @@ function LandingPage() {
                   <span
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "26px",
+                      fontSize: "24px",
                       fontWeight: 800,
                       color: "var(--color-text-primary)",
                       lineHeight: 1,
@@ -511,7 +445,7 @@ function LandingPage() {
                   >
                     {m.val}
                   </span>
-                  <span style={{ fontSize: "12px", color: "var(--color-text-secondary)" }}>
+                  <span style={{ fontSize: "12px", color: "var(--color-text-tertiary)" }}>
                     {m.label}
                   </span>
                 </div>
@@ -521,94 +455,26 @@ function LandingPage() {
 
           {/* Right: challenge card */}
           <motion.div
-            initial={{ opacity: 0, x: 32 }}
+            initial={{ opacity: 0, x: 28 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.72, delay: 0.22, ease: [0.22, 1, 0.36, 1] }}
           >
             <ChallengeCardMockup />
           </motion.div>
         </div>
       </section>
 
-      {/* ── STATS BAR ────────────────────────────────────────────────────── */}
-      <div
-        style={{
-          background: "var(--color-bg-secondary)",
-          borderTop: "1px solid var(--color-border-subtle)",
-          borderBottom: "1px solid var(--color-border-subtle)",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: "1240px",
-            margin: "0 auto",
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-          }}
-        >
-          {[
-            { n: "8", label: "focused modules", color: "var(--color-accent)" },
-            { n: "24", label: "coding challenges", color: "var(--color-text-primary)" },
-            { n: "2,500", label: "total XP to earn", color: "var(--color-xp)" },
-            { n: "< 6 hrs", label: "to complete the course", color: "var(--color-cyan)" },
-          ].map((s, i) => (
-            <FadeIn
-              key={i}
-              delay={i * 0.07}
-            >
-              <div
-                style={{
-                  padding: "36px 48px",
-                  borderRight: i < 3 ? "1px solid var(--color-border-subtle)" : "none",
-                }}
-              >
-                <div
-                  style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "42px",
-                    fontWeight: 800,
-                    lineHeight: 1,
-                    marginBottom: "6px",
-                    color: s.color,
-                  }}
-                >
-                  {s.n}
-                </div>
-                <div style={{ fontSize: "14px", color: "var(--color-text-secondary)" }}>
-                  {s.label}
-                </div>
-              </div>
-            </FadeIn>
-          ))}
-        </div>
-      </div>
-
-      {/* ── REFRAME ──────────────────────────────────────────────────────── */}
-      <section style={{ padding: "100px 48px" }}>
+      {/* ── THE DIFFERENCE ───────────────────────────────────────────────── */}
+      <section style={{ padding: "120px 48px", background: "var(--color-bg-secondary)" }}>
         <div style={{ maxWidth: "1240px", margin: "0 auto" }}>
           <FadeIn>
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                fontSize: "11px",
-                fontWeight: 700,
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: "var(--color-accent)",
-                marginBottom: "16px",
-              }}
-            >
-              <span style={{ width: "14px", height: "2px", background: "var(--color-accent)", display: "inline-block" }} />
-              The difference
-            </div>
+            <p className="eyebrow">The difference</p>
           </FadeIn>
           <FadeIn delay={0.08}>
             <h2
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(2rem, 4vw, 3rem)",
+                fontSize: "clamp(2rem, 3.5vw, 2.75rem)",
                 fontWeight: 800,
                 lineHeight: 1.08,
                 letterSpacing: "-0.025em",
@@ -619,21 +485,22 @@ function LandingPage() {
             </h2>
           </FadeIn>
           <FadeIn delay={0.14}>
-            <p style={{ fontSize: "17px", color: "var(--color-text-secondary)", lineHeight: 1.65, maxWidth: "540px" }}>
+            <p style={{ fontSize: "17px", color: "var(--color-text-secondary)", lineHeight: 1.65, maxWidth: "520px", marginBottom: "52px" }}>
               Every algorithm is grounded in where it actually lives — in production AI systems you can name.
             </p>
           </FadeIn>
 
-          <div style={{ marginTop: "56px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
-            {/* Traditional */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+            {/* Left: Traditional — visually suppressed */}
             <FadeIn delay={0.1}>
               <div
                 style={{
-                  background: "var(--color-bg-card)",
-                  border: "1px solid var(--color-border)",
+                  background: "rgba(14,16,24,0.6)",
+                  border: "1px solid var(--color-border-subtle)",
                   borderRadius: "16px",
                   padding: "32px",
                   height: "100%",
+                  opacity: 0.75,
                 }}
               >
                 <span
@@ -646,13 +513,13 @@ function LandingPage() {
                     letterSpacing: "0.08em",
                     textTransform: "uppercase",
                     marginBottom: "24px",
-                    background: "rgba(52,61,79,0.5)",
+                    background: "rgba(28,32,51,0.8)",
                     color: "var(--color-text-tertiary)",
                   }}
                 >
-                  Traditional DSA course
+                  Conventional DSA course
                 </span>
-                <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "14px" }}>
+                <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "12px" }}>
                   {[
                     "\"Implement a hash map from scratch\"",
                     "\"Sort this array of integers\"",
@@ -660,25 +527,34 @@ function LandingPage() {
                     "\"Find the shortest path in a graph\"",
                     "\"Compute edit distance between strings\"",
                   ].map((item, i) => (
-                    <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: "12px", fontSize: "14px", lineHeight: 1.55, color: "var(--color-text-tertiary)" }}>
-                      <div
+                    <li
+                      key={i}
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: "10px",
+                        fontSize: "13.5px",
+                        lineHeight: 1.55,
+                        color: "var(--color-text-tertiary)",
+                      }}
+                    >
+                      <span
                         style={{
-                          width: "20px",
-                          height: "20px",
-                          borderRadius: "50%",
                           flexShrink: 0,
-                          marginTop: "1px",
+                          marginTop: "3px",
+                          width: "14px",
+                          height: "14px",
+                          borderRadius: "50%",
+                          background: "rgba(52,61,79,0.6)",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          background: "var(--color-text-tertiary)",
-                          color: "#09090e",
-                          fontSize: "10px",
-                          fontWeight: 700,
+                          fontSize: "8px",
+                          color: "var(--color-text-tertiary)",
                         }}
                       >
                         ✕
-                      </div>
+                      </span>
                       {item}
                     </li>
                   ))}
@@ -686,15 +562,16 @@ function LandingPage() {
               </div>
             </FadeIn>
 
-            {/* DSA for AI */}
+            {/* Right: DSA for AI — elevated */}
             <FadeIn delay={0.18}>
               <div
                 style={{
                   background: "var(--color-bg-card)",
-                  border: "1px solid rgba(124,106,247,0.25)",
+                  border: "1px solid rgba(255,255,255,0.08)",
                   borderRadius: "16px",
                   padding: "32px",
                   height: "100%",
+                  boxShadow: "var(--shadow-m)",
                 }}
               >
                 <span
@@ -707,14 +584,14 @@ function LandingPage() {
                     letterSpacing: "0.08em",
                     textTransform: "uppercase",
                     marginBottom: "24px",
-                    background: "rgba(124,106,247,0.12)",
-                    border: "1px solid rgba(124,106,247,0.3)",
-                    color: "var(--color-accent)",
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    color: "var(--color-text-primary)",
                   }}
                 >
-                  DSA for AI
+                  DSA for AI Engineering
                 </span>
-                <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "14px" }}>
+                <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "12px" }}>
                   {[
                     "Build the token lookup table that powers a tokenizer",
                     "Implement quickselect to rank beam search candidates",
@@ -722,25 +599,35 @@ function LandingPage() {
                     "Run BFS on a knowledge graph for multi-hop reasoning",
                     "Use edit distance for fuzzy matching in RAG retrieval",
                   ].map((item, i) => (
-                    <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: "12px", fontSize: "14px", lineHeight: 1.55, color: "var(--color-text-primary)" }}>
-                      <div
+                    <li
+                      key={i}
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: "10px",
+                        fontSize: "13.5px",
+                        lineHeight: 1.55,
+                        color: "var(--color-text-primary)",
+                      }}
+                    >
+                      <span
                         style={{
-                          width: "20px",
-                          height: "20px",
-                          borderRadius: "50%",
                           flexShrink: 0,
-                          marginTop: "1px",
+                          marginTop: "3px",
+                          width: "14px",
+                          height: "14px",
+                          borderRadius: "50%",
+                          background: "rgba(255,255,255,0.07)",
+                          border: "1px solid rgba(255,255,255,0.14)",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          background: "var(--color-accent)",
-                          color: "#fff",
-                          fontSize: "10px",
-                          fontWeight: 700,
+                          fontSize: "8px",
+                          color: "var(--color-text-primary)",
                         }}
                       >
                         ✓
-                      </div>
+                      </span>
                       {item}
                     </li>
                   ))}
@@ -755,32 +642,17 @@ function LandingPage() {
       <section
         ref={curriculumRef}
         id="curriculum"
-        style={{ padding: "100px 48px", background: "var(--color-bg-secondary)" }}
+        style={{ padding: "120px 48px" }}
       >
         <div style={{ maxWidth: "1240px", margin: "0 auto" }}>
           <FadeIn>
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                fontSize: "11px",
-                fontWeight: 700,
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: "var(--color-accent)",
-                marginBottom: "16px",
-              }}
-            >
-              <span style={{ width: "14px", height: "2px", background: "var(--color-accent)", display: "inline-block" }} />
-              Curriculum
-            </div>
+            <p className="eyebrow">Curriculum</p>
           </FadeIn>
           <FadeIn delay={0.08}>
             <h2
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(2rem, 4vw, 3rem)",
+                fontSize: "clamp(2rem, 3.5vw, 2.75rem)",
                 fontWeight: 800,
                 lineHeight: 1.08,
                 letterSpacing: "-0.025em",
@@ -791,124 +663,106 @@ function LandingPage() {
             </h2>
           </FadeIn>
           <FadeIn delay={0.14}>
-            <p style={{ fontSize: "17px", color: "var(--color-text-secondary)", lineHeight: 1.65, maxWidth: "540px" }}>
-              Sequential, XP-gated. Each module unlocks the next. Complete the course in one focused sitting.
+            <p style={{ fontSize: "17px", color: "var(--color-text-secondary)", lineHeight: 1.65, maxWidth: "500px", marginBottom: "52px" }}>
+              Sequential, XP-gated. Each module unlocks the next.
             </p>
           </FadeIn>
 
-          <div
-            style={{
-              marginTop: "56px",
-              display: "grid",
-              gridTemplateColumns: "repeat(4, 1fr)",
-              gap: "14px",
-            }}
-          >
-            {MODULES.map((mod, i) => {
-              const Icon = ICONS[mod.icon] ?? Layers;
-              const color = MODULE_COLORS[i] ?? "var(--color-accent)";
-              return (
-                <FadeIn key={mod.id} delay={0.05 + (i % 4) * 0.07}>
-                  <div
+          {/* Module list */}
+          <FadeIn delay={0.1}>
+            <div
+              style={{
+                border: "1px solid var(--color-border)",
+                borderRadius: "16px",
+                overflow: "hidden",
+                boxShadow: "var(--shadow-s)",
+              }}
+            >
+              {MODULES.map((mod, i) => {
+                const Icon = ICONS[mod.icon] ?? Layers;
+                const color = MODULE_COLORS[i] ?? "var(--color-accent)";
+                return (
+                  <motion.div
+                    key={mod.id}
+                    initial={{ opacity: 0, x: -6 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, margin: "-20px" }}
+                    transition={{ duration: 0.5, delay: i * 0.04, ease: [0.22, 1, 0.36, 1] }}
+                    className="mod-row"
                     style={{
-                      background: "var(--color-bg-card)",
-                      border: "1px solid var(--color-border)",
-                      borderRadius: "14px",
-                      padding: "22px",
-                      cursor: "default",
-                      transition: "background 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s",
-                      position: "relative",
-                      overflow: "hidden",
-                      height: "100%",
-                    }}
-                    onMouseEnter={(e) => {
-                      const el = e.currentTarget as HTMLElement;
-                      el.style.background = "var(--color-bg-card-hover)";
-                      el.style.borderColor = "rgba(124,106,247,0.4)";
-                      el.style.transform = "translateY(-3px)";
-                      el.style.boxShadow = "0 16px 40px rgba(0,0,0,0.5)";
-                      const bar = el.querySelector(".mod-bar") as HTMLElement | null;
-                      if (bar) bar.style.opacity = "1";
-                    }}
-                    onMouseLeave={(e) => {
-                      const el = e.currentTarget as HTMLElement;
-                      el.style.background = "var(--color-bg-card)";
-                      el.style.borderColor = "var(--color-border)";
-                      el.style.transform = "";
-                      el.style.boxShadow = "";
-                      const bar = el.querySelector(".mod-bar") as HTMLElement | null;
-                      if (bar) bar.style.opacity = "0";
+                      borderBottom: i < MODULES.length - 1 ? "1px solid var(--color-border-subtle)" : "none",
+                      borderLeft: `2px solid ${color}`,
                     }}
                   >
-                    {/* Top accent bar */}
-                    <div
-                      className="mod-bar"
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        height: "2px",
-                        background: "linear-gradient(90deg, var(--color-accent), var(--color-cyan))",
-                        opacity: 0,
-                        transition: "opacity 0.2s",
-                      }}
-                    />
-                    <div
+                    {/* Number */}
+                    <span
                       style={{
                         fontFamily: "var(--font-mono)",
-                        fontSize: "10px",
+                        fontSize: "11px",
                         fontWeight: 600,
-                        color: "var(--color-text-tertiary)",
-                        marginBottom: "14px",
+                        color,
+                        width: "20px",
+                        flexShrink: 0,
+                        opacity: 0.85,
                       }}
                     >
                       {String(mod.order + 1).padStart(2, "0")}
-                    </div>
+                    </span>
+
+                    {/* Icon */}
                     <div
                       style={{
-                        width: "40px",
-                        height: "40px",
-                        borderRadius: "10px",
+                        width: "32px",
+                        height: "32px",
+                        borderRadius: "8px",
+                        flexShrink: 0,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        marginBottom: "14px",
-                        background: `${color}1a`,
+                        background: `${color}18`,
                         color,
                       }}
                     >
-                      <Icon size={18} />
+                      <Icon size={15} />
                     </div>
-                    <div
-                      style={{
-                        fontFamily: "var(--font-display)",
-                        fontSize: "15px",
-                        fontWeight: 700,
-                        color: "var(--color-text-primary)",
-                        lineHeight: 1.3,
-                        marginBottom: "8px",
-                      }}
-                    >
-                      {mod.title}
+
+                    {/* Content */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div
+                        style={{
+                          fontFamily: "var(--font-display)",
+                          fontSize: "14px",
+                          fontWeight: 700,
+                          color: "var(--color-text-primary)",
+                          marginBottom: "2px",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
+                        {mod.title}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "12px",
+                          color: "var(--color-text-secondary)",
+                          lineHeight: 1.5,
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
+                        {mod.description}
+                      </div>
                     </div>
-                    <div
-                      style={{
-                        fontSize: "12px",
-                        color: "var(--color-text-secondary)",
-                        lineHeight: 1.55,
-                        marginBottom: "18px",
-                      }}
-                    >
-                      {mod.description}
-                    </div>
+
+                    {/* Stats */}
                     <div
                       style={{
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "space-between",
-                        paddingTop: "14px",
-                        borderTop: "1px solid var(--color-border-subtle)",
+                        gap: "20px",
+                        flexShrink: 0,
                         fontFamily: "var(--font-mono)",
                         fontSize: "11px",
                       }}
@@ -920,109 +774,134 @@ function LandingPage() {
                         {mod.estimatedMinutes} min
                       </span>
                     </div>
-                  </div>
-                </FadeIn>
-              );
-            })}
-          </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </FadeIn>
         </div>
       </section>
 
       {/* ── HOW IT WORKS ─────────────────────────────────────────────────── */}
-      <section id="how" style={{ padding: "100px 48px" }}>
+      <section id="how" style={{ padding: "120px 48px", background: "var(--color-bg-secondary)" }}>
         <div style={{ maxWidth: "1240px", margin: "0 auto" }}>
           <FadeIn>
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                fontSize: "11px",
-                fontWeight: 700,
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: "var(--color-accent)",
-                marginBottom: "16px",
-              }}
-            >
-              <span style={{ width: "14px", height: "2px", background: "var(--color-accent)", display: "inline-block" }} />
-              How it works
-            </div>
+            <p className="eyebrow">How it works</p>
           </FadeIn>
           <FadeIn delay={0.08}>
             <h2
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(2rem, 4vw, 3rem)",
+                fontSize: "clamp(2rem, 3.5vw, 2.75rem)",
                 fontWeight: 800,
                 lineHeight: 1.08,
                 letterSpacing: "-0.025em",
                 marginBottom: "14px",
               }}
             >
-              Write code.<br />See it run. Earn XP.
+              Write code. See it run.<br />Earn XP.
             </h2>
           </FadeIn>
           <FadeIn delay={0.14}>
-            <p style={{ fontSize: "17px", color: "var(--color-text-secondary)", lineHeight: 1.65, maxWidth: "540px" }}>
+            <p style={{ fontSize: "17px", color: "var(--color-text-secondary)", lineHeight: 1.65, maxWidth: "520px" }}>
               No installs, no environment setup — open a tab and start coding immediately.
             </p>
           </FadeIn>
 
-          <div style={{ marginTop: "64px", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "40px" }}>
-            {[
-              {
-                n: "01",
-                title: "Read the AI framing",
-                desc: "Each challenge opens with the real AI system it connects to. You understand why the algorithm matters before you write a single line.",
-              },
-              {
-                n: "02",
-                title: "Write Python in the browser",
-                desc: (
-                  <>
-                    A full Python runtime (<code style={{ fontFamily: "var(--font-mono)", fontSize: "13px", background: "var(--color-bg-card)", border: "1px solid var(--color-border)", borderRadius: "4px", padding: "1px 6px", color: "var(--color-cyan)" }}>Pyodide WASM</code>) runs directly in your tab. No notebooks, no terminal — just a code editor and instant feedback.
-                  </>
-                ),
-              },
-              {
-                n: "03",
-                title: "Pass tests. Earn XP. Unlock next.",
-                desc: "Tests run in milliseconds. Pass all tests to earn XP and unlock the next challenge. Your mastery is tracked across all 8 modules.",
-              },
-            ].map((step, i) => (
-              <FadeIn key={i} delay={0.05 + i * 0.1}>
-                <div>
-                  <div
-                    style={{
-                      fontFamily: "var(--font-display)",
-                      fontSize: "80px",
-                      fontWeight: 900,
-                      lineHeight: 1,
-                      color: "var(--color-border)",
-                      marginBottom: "20px",
-                      letterSpacing: "-0.04em",
-                    }}
-                  >
-                    {step.n}
+          {/* Steps */}
+          <div style={{ marginTop: "72px", position: "relative" }}>
+            {/* Horizontal connector line */}
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                top: "19px",
+                left: "calc(16.67% + 19px)",
+                right: "calc(16.67% + 19px)",
+                height: "1px",
+                background: "linear-gradient(90deg, transparent, var(--color-border) 15%, var(--color-border) 85%, transparent)",
+                pointerEvents: "none",
+              }}
+            />
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "40px" }}>
+              {[
+                {
+                  title: "Read the AI framing",
+                  desc: "Each challenge opens with the real AI system it connects to. You understand why the algorithm matters before writing a line.",
+                },
+                {
+                  title: "Write Python in the browser",
+                  desc: (
+                    <>
+                      A full Python runtime ({" "}
+                      <code
+                        style={{
+                          fontFamily: "var(--font-mono)",
+                          fontSize: "12px",
+                          background: "rgba(19,22,31,0.9)",
+                          border: "1px solid rgba(255,255,255,0.1)",
+                          borderRadius: "4px",
+                          padding: "1px 6px",
+                          color: "var(--color-text-secondary)",
+                        }}
+                      >
+                        Pyodide WASM
+                      </code>
+                      {" "}) runs in your tab. No notebooks, no terminal.
+                    </>
+                  ),
+                },
+                {
+                  title: "Pass tests. Earn XP. Unlock next.",
+                  desc: "Tests run in milliseconds. Pass all tests to earn XP and unlock the next challenge. Mastery tracked across all 8 modules.",
+                },
+              ].map((step, i) => (
+                <FadeIn key={i} delay={0.08 + i * 0.1}>
+                  <div>
+                    {/* Step circle */}
+                    <div
+                      style={{
+                        width: "38px",
+                        height: "38px",
+                        borderRadius: "50%",
+                        background: "var(--color-bg-card)",
+                        border: "1px solid var(--color-border)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "12px",
+                        fontWeight: 600,
+                        color: "var(--color-text-secondary)",
+                        marginBottom: "28px",
+                        position: "relative",
+                        zIndex: 1,
+                        boxShadow: "var(--shadow-s)",
+                      }}
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </div>
+
+                    <div
+                      style={{
+                        fontFamily: "var(--font-display)",
+                        fontSize: "19px",
+                        fontWeight: 700,
+                        color: "var(--color-text-primary)",
+                        marginBottom: "10px",
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {step.title}
+                    </div>
+                    <p style={{ fontSize: "14.5px", color: "var(--color-text-secondary)", lineHeight: 1.72 }}>
+                      {step.desc}
+                    </p>
                   </div>
-                  <div
-                    style={{
-                      fontFamily: "var(--font-display)",
-                      fontSize: "22px",
-                      fontWeight: 700,
-                      color: "var(--color-text-primary)",
-                      marginBottom: "12px",
-                    }}
-                  >
-                    {step.title}
-                  </div>
-                  <p style={{ fontSize: "15px", color: "var(--color-text-secondary)", lineHeight: 1.7 }}>
-                    {step.desc}
-                  </p>
-                </div>
-              </FadeIn>
-            ))}
+                </FadeIn>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -1030,7 +909,7 @@ function LandingPage() {
       {/* ── CTA ──────────────────────────────────────────────────────────── */}
       <section
         style={{
-          padding: "120px 48px",
+          padding: "140px 48px",
           textAlign: "center",
           position: "relative",
           overflow: "hidden",
@@ -1043,28 +922,28 @@ function LandingPage() {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: "900px",
-            height: "500px",
-            background: "radial-gradient(ellipse, rgba(124,106,247,0.11) 0%, transparent 65%)",
+            width: "800px",
+            height: "480px",
+            background: "radial-gradient(ellipse, rgba(255,255,255,0.02) 0%, transparent 60%)",
             pointerEvents: "none",
           }}
         />
-        <div style={{ maxWidth: "620px", margin: "0 auto", position: "relative" }}>
+        <div style={{ maxWidth: "560px", margin: "0 auto", position: "relative" }}>
           <FadeIn>
             <h2
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(2.2rem, 4.5vw, 3.5rem)",
+                fontSize: "clamp(2.2rem, 4vw, 3.2rem)",
                 fontWeight: 800,
                 lineHeight: 1.07,
                 letterSpacing: "-0.025em",
-                marginBottom: "18px",
+                marginBottom: "20px",
               }}
             >
-              Start building.<br />
+              Start building.{" "}
               <span
                 style={{
-                  background: "linear-gradient(120deg, var(--color-accent) 0%, var(--color-cyan) 100%)",
+                  background: "linear-gradient(118deg, #d0d4e4 0%, #707080 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
@@ -1075,74 +954,16 @@ function LandingPage() {
             </h2>
           </FadeIn>
           <FadeIn delay={0.08}>
-            <p style={{ fontSize: "17px", color: "var(--color-text-secondary)", lineHeight: 1.6, marginBottom: "40px" }}>
+            <p style={{ fontSize: "17px", color: "var(--color-text-secondary)", lineHeight: 1.65, marginBottom: "44px" }}>
               24 real coding challenges. Python in your browser. Algorithms that actually matter for AI engineering.
             </p>
           </FadeIn>
           <FadeIn delay={0.14}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "14px" }}>
-              <button
-                onClick={signInWithGoogle}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  padding: "14px 28px",
-                  borderRadius: "10px",
-                  fontFamily: "var(--font-sans)",
-                  fontSize: "15px",
-                  fontWeight: 600,
-                  background: "var(--color-accent)",
-                  color: "#fff",
-                  border: "none",
-                  cursor: "pointer",
-                  boxShadow: "0 0 24px rgba(124,106,247,0.35)",
-                  transition: "all 0.18s",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "var(--color-accent-hover)";
-                  (e.currentTarget as HTMLElement).style.boxShadow = "0 0 36px rgba(124,106,247,0.5)";
-                  (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "var(--color-accent)";
-                  (e.currentTarget as HTMLElement).style.boxShadow = "0 0 24px rgba(124,106,247,0.35)";
-                  (e.currentTarget as HTMLElement).style.transform = "";
-                }}
-              >
-                Start Learning Free &nbsp;→
-              </button>
-              <button
-                onClick={scrollToCurriculum}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  padding: "14px 28px",
-                  borderRadius: "10px",
-                  fontFamily: "var(--font-sans)",
-                  fontSize: "15px",
-                  fontWeight: 600,
-                  background: "transparent",
-                  color: "var(--color-text-secondary)",
-                  border: "1px solid var(--color-border)",
-                  cursor: "pointer",
-                  transition: "all 0.18s",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "var(--color-bg-card)";
-                  (e.currentTarget as HTMLElement).style.color = "var(--color-text-primary)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "transparent";
-                  (e.currentTarget as HTMLElement).style.color = "var(--color-text-secondary)";
-                }}
-              >
-                Browse Curriculum
-              </button>
-            </div>
+            <button onClick={signInWithGoogle} className="btn-primary" style={{ fontSize: "16px", padding: "15px 32px" }}>
+              Start Learning Free &nbsp;→
+            </button>
           </FadeIn>
-          <FadeIn delay={0.2}>
+          <FadeIn delay={0.22}>
             <p style={{ marginTop: "20px", fontSize: "12px", color: "var(--color-text-tertiary)" }}>
               No account required to try. Sign in with Google to save progress.
             </p>
@@ -1173,16 +994,17 @@ function LandingPage() {
         >
           <div
             style={{
-              width: "30px",
-              height: "30px",
-              background: "var(--color-accent)",
+              width: "28px",
+              height: "28px",
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid rgba(255,255,255,0.1)",
               borderRadius: "7px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: "15px",
+              fontSize: "13px",
               fontWeight: 800,
-              color: "#fff",
+              color: "var(--color-accent)",
               fontFamily: "var(--font-mono)",
             }}
           >
@@ -1234,23 +1056,11 @@ function Dashboard() {
         {next && (
           <Link
             href={`/challenge/${next.challenge.slug}`}
-            className="animate-pulse-ring flex items-center gap-2 px-5 py-2.5 rounded-xl text-white font-semibold text-sm shrink-0"
-            style={{
-              background: "linear-gradient(135deg, #7c6af7 0%, #9585ff 100%)",
-              boxShadow: "0 4px 20px rgba(124,106,247,0.35)",
-              transition: "transform 0.2s ease, box-shadow 0.2s ease",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
-              (e.currentTarget as HTMLElement).style.boxShadow = "0 6px 28px rgba(124,106,247,0.45)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.transform = "";
-              (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 20px rgba(124,106,247,0.35)";
-            }}
+            className="btn-primary animate-pulse-ring shrink-0"
+            style={{ fontSize: "14px", padding: "10px 20px" }}
           >
             Continue
-            <ArrowRight size={15} />
+            <ArrowRight size={14} />
           </Link>
         )}
         {!next && totalCompleted > 0 && (
@@ -1259,12 +1069,12 @@ function Dashboard() {
             animate={{ scale: 1, opacity: 1 }}
             className="px-5 py-2.5 rounded-xl font-medium text-sm"
             style={{
-              background: "rgba(16,185,129,0.1)",
+              background: "rgba(16,185,129,0.08)",
               color: "#10b981",
-              border: "1px solid rgba(16,185,129,0.25)",
+              border: "1px solid rgba(16,185,129,0.2)",
             }}
           >
-            Path Complete! 🎉
+            Path Complete!
           </motion.div>
         )}
       </motion.div>
@@ -1277,10 +1087,11 @@ function Dashboard() {
         className="rounded-2xl border p-5"
         style={{
           border: "1px solid var(--color-border)",
-          background: "linear-gradient(135deg, rgba(19,22,31,0.9) 0%, rgba(13,16,24,0.9) 100%)",
+          background: "var(--color-bg-card)",
+          boxShadow: "var(--shadow-s)",
         }}
       >
-        <div className="flex justify-between text-sm mb-2.5">
+        <div className="flex justify-between text-sm mb-3">
           <span style={{ color: "var(--color-text-secondary)" }}>Overall progress</span>
           <span
             className="font-semibold font-mono"
@@ -1290,14 +1101,13 @@ function Dashboard() {
           </span>
         </div>
         <div
-          className="h-2.5 rounded-full overflow-hidden shimmer"
+          className="h-2 rounded-full overflow-hidden"
           style={{ background: "var(--color-border)" }}
         >
           <motion.div
-            className="h-full rounded-full"
+            className="h-full rounded-full shimmer"
             style={{
-              background: "linear-gradient(90deg, var(--color-accent) 0%, #22d3ee 100%)",
-              boxShadow: "0 0 12px rgba(124,106,247,0.4)",
+              background: "linear-gradient(90deg, #a4abbe 0%, #606070 100%)",
             }}
             initial={{ width: "0%" }}
             animate={{ width: `${overallPct}%` }}
@@ -1327,10 +1137,10 @@ export default function Home() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div
-          className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin"
+          className="w-7 h-7 rounded-full border-2 animate-spin"
           style={{
-            borderColor: "rgba(124,106,247,0.3)",
-            borderTopColor: "transparent",
+            borderColor: "var(--color-border)",
+            borderTopColor: "var(--color-accent)",
           }}
         />
       </div>

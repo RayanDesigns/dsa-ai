@@ -77,9 +77,9 @@ export default function RecapPage({ params }: { params: Promise<{ sessionId: str
           <div className="text-2xl font-bold font-mono text-amber-400">{xpDisplay}</div>
           <div className="text-xs text-[var(--color-text-secondary)] mt-1">XP earned</div>
         </div>
-        <div className="rounded-xl border border-[var(--color-accent)]/30 bg-[var(--color-accent)]/10 p-4">
-          <CheckCircle2 className="text-[var(--color-accent)] mx-auto mb-2" size={20} />
-          <div className="text-2xl font-bold font-mono text-[var(--color-accent)]">
+        <div className="rounded-xl p-4" style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", boxShadow: "var(--shadow-s)" }}>
+          <CheckCircle2 className="mx-auto mb-2" style={{ color: "var(--color-text-primary)" }} size={20} />
+          <div className="text-2xl font-bold font-mono" style={{ color: "var(--color-text-primary)" }}>
             {completedThisSession.length}
           </div>
           <div className="text-xs text-[var(--color-text-secondary)] mt-1">Challenges</div>
@@ -120,7 +120,8 @@ export default function RecapPage({ params }: { params: Promise<{ sessionId: str
         {next && (
           <Link
             href={`/challenge/${next.challenge.slug}`}
-            className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white font-medium transition-colors"
+            className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all"
+            style={{ background: "#a4abbe", color: "#07070d", boxShadow: "var(--shadow-m)" }}
           >
             Continue Learning
             <ArrowRight size={16} />

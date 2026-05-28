@@ -67,10 +67,11 @@ export default function ModulePage({ params }: { params: Promise<{ slug: string 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="rounded-2xl border p-6 overflow-hidden relative"
+        className="rounded-2xl p-6 overflow-hidden relative"
         style={{
-          border: `1px solid ${module.accentColor}35`,
-          background: `linear-gradient(135deg, ${module.accentColor}07 0%, rgba(19,22,31,0.9) 60%)`,
+          border: `1px solid ${module.accentColor}30`,
+          background: `linear-gradient(160deg, ${module.accentColor}08 0%, #0f1018 55%)`,
+          boxShadow: "var(--shadow-m)",
         }}
       >
         {/* Top accent line */}
@@ -85,9 +86,10 @@ export default function ModulePage({ params }: { params: Promise<{ slug: string 
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
             style={{
-              backgroundColor: `${module.accentColor}18`,
+              backgroundColor: `${module.accentColor}14`,
               color: module.accentColor,
-              boxShadow: `0 0 20px ${module.accentColor}25`,
+              boxShadow: "var(--shadow-xs)",
+              border: `1px solid ${module.accentColor}22`,
             }}
           >
             <Icon size={22} />
@@ -145,7 +147,7 @@ export default function ModulePage({ params }: { params: Promise<{ slug: string 
         <div className="mt-3">
           <div
             className="h-1.5 rounded-full overflow-hidden"
-            style={{ background: "rgba(255,255,255,0.06)" }}
+            style={{ background: "rgba(0,0,0,0.3)", boxShadow: "var(--shadow-inset)" }}
           >
             <motion.div
               className="h-full rounded-full"
@@ -162,7 +164,10 @@ export default function ModulePage({ params }: { params: Promise<{ slug: string 
       </motion.div>
 
       {/* Challenge list */}
-      <div className="space-y-2">
+      <div
+        className="space-y-2 rounded-2xl p-4"
+        style={{ background: "rgba(255,255,255,0.015)", border: "1px solid rgba(255,255,255,0.05)", boxShadow: "var(--shadow-s)" }}
+      >
         <motion.h2
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -197,18 +202,21 @@ export default function ModulePage({ params }: { params: Promise<{ slug: string 
         >
           <Link
             href={`/challenge/${module.challenges[0].slug}`}
-            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-semibold text-sm text-white transition-all duration-200"
+            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200"
             style={{
-              background: `linear-gradient(135deg, ${module.accentColor} 0%, ${module.accentColor}cc 100%)`,
-              boxShadow: `0 4px 20px ${module.accentColor}30`,
+              background: "#a4abbe",
+              color: "#07070d",
+              boxShadow: "var(--shadow-m)",
             }}
             onMouseEnter={(e) => {
               (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
-              (e.currentTarget as HTMLElement).style.boxShadow = `0 8px 28px ${module.accentColor}40`;
+              (e.currentTarget as HTMLElement).style.background = "#b8c0d4";
+              (e.currentTarget as HTMLElement).style.boxShadow = "var(--shadow-l)";
             }}
             onMouseLeave={(e) => {
               (e.currentTarget as HTMLElement).style.transform = "";
-              (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 20px ${module.accentColor}30`;
+              (e.currentTarget as HTMLElement).style.background = "#a4abbe";
+              (e.currentTarget as HTMLElement).style.boxShadow = "var(--shadow-m)";
             }}
           >
             Start Module

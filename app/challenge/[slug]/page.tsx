@@ -33,54 +33,196 @@ const CodeEditor = dynamic(
   }
 );
 
-function MarkdownBlock({ content }: { content: string }) {
+// ─── Inline renderer: bold, italic, code, math ────────────────────────────
+function renderInline(text: string, key?: string | number): React.ReactNode {
+  const segments = text.split(/(\$[^$]+\$|\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g);
+  if (segments.length === 1) return text;
   return (
-    <div className="prose prose-invert prose-sm max-w-none space-y-2" style={{ color: "var(--color-text-secondary)" }}>
-      {content.split("\n").map((line, i) => {
-        if (line.startsWith("## ")) {
+    <span key={key}>
+      {segments.map((seg, i) => {
+        if (seg.startsWith("**") && seg.endsWith("**"))
+          return <strong key={i} style={{ color: "var(--color-text-primary)", fontWeight: 600 }}>{seg.slice(2, -2)}</strong>;
+        if (seg.startsWith("*") && seg.endsWith("*"))
+          return <em key={i} style={{ color: "var(--color-text-secondary)", fontStyle: "italic" }}>{seg.slice(1, -1)}</em>;
+        if (seg.startsWith("`") && seg.endsWith("`"))
           return (
-            <h2
-              key={i}
-              className="font-display font-semibold mt-5 mb-1.5"
-              style={{ color: "var(--color-text-primary)", fontSize: "15px" }}
-            >
-              {line.slice(3)}
-            </h2>
+            <code key={i} style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "12px",
+              padding: "1px 6px",
+              borderRadius: "4px",
+              background: "rgba(0,0,0,0.4)",
+              color: "#9ab0cc",
+              border: "1px solid rgba(255,255,255,0.08)",
+              boxShadow: "var(--shadow-xs)",
+            }}>{seg.slice(1, -1)}</code>
           );
-        }
-        if (line.startsWith("**") && line.endsWith("**")) {
+        if (seg.startsWith("$") && seg.endsWith("$"))
           return (
-            <p key={i} className="font-semibold" style={{ color: "var(--color-text-primary)" }}>
-              {line.slice(2, -2)}
-            </p>
+            <span key={i} style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "12.5px",
+              padding: "1px 7px",
+              borderRadius: "4px",
+              background: "rgba(164,171,190,0.07)",
+              color: "#c8d0e8",
+              border: "1px solid rgba(164,171,190,0.14)",
+              letterSpacing: "0.01em",
+              fontStyle: "italic",
+            }}>{seg.slice(1, -1)}</span>
           );
-        }
-        if (line.startsWith("```")) return null;
-        if (line.trim() === "") return <br key={i} />;
-        const parts = line.split(/(`[^`]+`)/g);
-        return (
-          <p key={i} className="leading-relaxed">
-            {parts.map((part, j) =>
-              part.startsWith("`") && part.endsWith("`") ? (
-                <code
-                  key={j}
-                  className="px-1.5 py-0.5 rounded font-mono"
-                  style={{
-                    background: "rgba(19,22,31,0.9)",
-                    color: "#67e8f9",
-                    fontSize: "12px",
-                    border: "1px solid rgba(103,232,249,0.15)",
-                  }}
-                >
-                  {part.slice(1, -1)}
-                </code>
-              ) : (
-                part
-              )
-            )}
-          </p>
-        );
+        return seg;
       })}
+    </span>
+  );
+}
+
+// ─── Markdown block renderer ───────────────────────────────────────────────
+function MarkdownBlock({ content }: { content: string }) {
+  const blocks: React.ReactNode[] = [];
+  const lines = content.split("\n");
+  let i = 0;
+  let key = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+
+    // Fenced code block
+    if (line.startsWith("```")) {
+      const lang = line.slice(3).trim();
+      const codeLines: string[] = [];
+      i++;
+      while (i < lines.length && !lines[i].startsWith("```")) {
+        codeLines.push(lines[i]);
+        i++;
+      }
+      i++; // skip closing ```
+      const codeStr = codeLines.join("\n").trimEnd();
+      const looksLikeMath = !lang && /[=≤≥∈∑∏√⁰¹²³⁴⁵⁶⁷⁸⁹]|[a-z]\[|\/\(|\|\||\.\.\./.test(codeStr);
+      blocks.push(
+        <div
+          key={key++}
+          style={{
+            margin: "12px 0",
+            borderRadius: "8px",
+            overflow: "hidden",
+            border: "1px solid rgba(255,255,255,0.07)",
+            boxShadow: "var(--shadow-s)",
+          }}
+        >
+          {(lang || looksLikeMath) && (
+            <div style={{
+              padding: "5px 14px 4px",
+              background: "rgba(0,0,0,0.3)",
+              borderBottom: "1px solid rgba(255,255,255,0.05)",
+              fontFamily: "var(--font-mono)",
+              fontSize: "10px",
+              color: "var(--color-text-tertiary)",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+            }}>
+              {looksLikeMath ? "formula" : lang}
+            </div>
+          )}
+          <pre style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "13px",
+            lineHeight: 1.7,
+            padding: "12px 16px",
+            background: looksLikeMath ? "rgba(164,171,190,0.04)" : "rgba(0,0,0,0.28)",
+            color: looksLikeMath ? "#c8d0e8" : "#a8b8c8",
+            overflowX: "auto",
+            whiteSpace: "pre",
+            margin: 0,
+          }}>{codeStr}</pre>
+        </div>
+      );
+      continue;
+    }
+
+    // H2
+    if (line.startsWith("## ")) {
+      blocks.push(
+        <h2 key={key++} style={{
+          fontFamily: "var(--font-display)",
+          fontSize: "15px",
+          fontWeight: 700,
+          color: "var(--color-text-primary)",
+          letterSpacing: "-0.01em",
+          margin: "20px 0 8px",
+          paddingBottom: "6px",
+          borderBottom: "1px solid rgba(255,255,255,0.06)",
+        }}>{line.slice(3)}</h2>
+      );
+      i++; continue;
+    }
+
+    // H3
+    if (line.startsWith("### ")) {
+      blocks.push(
+        <h3 key={key++} style={{
+          fontFamily: "var(--font-display)",
+          fontSize: "13px",
+          fontWeight: 600,
+          color: "var(--color-text-primary)",
+          margin: "16px 0 6px",
+          textTransform: "uppercase",
+          letterSpacing: "0.06em",
+        }}>{line.slice(4)}</h3>
+      );
+      i++; continue;
+    }
+
+    // Bullet list — collect consecutive items
+    if (line.startsWith("- ") || line.startsWith("* ")) {
+      const items: string[] = [];
+      while (i < lines.length && (lines[i].startsWith("- ") || lines[i].startsWith("* "))) {
+        items.push(lines[i].slice(2));
+        i++;
+      }
+      blocks.push(
+        <ul key={key++} style={{ margin: "8px 0", paddingLeft: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: "6px" }}>
+          {items.map((item, j) => (
+            <li key={j} style={{ display: "flex", alignItems: "flex-start", gap: "10px", fontSize: "13.5px", lineHeight: 1.6, color: "var(--color-text-secondary)" }}>
+              <span style={{
+                flexShrink: 0,
+                marginTop: "6px",
+                width: "4px",
+                height: "4px",
+                borderRadius: "50%",
+                background: "rgba(164,171,190,0.45)",
+              }} />
+              <span>{renderInline(item)}</span>
+            </li>
+          ))}
+        </ul>
+      );
+      continue;
+    }
+
+    // Divider
+    if (line.trim() === "---") {
+      blocks.push(<hr key={key++} style={{ border: "none", borderTop: "1px solid rgba(255,255,255,0.06)", margin: "14px 0" }} />);
+      i++; continue;
+    }
+
+    // Empty line → spacer
+    if (line.trim() === "") {
+      i++; continue;
+    }
+
+    // Paragraph
+    blocks.push(
+      <p key={key++} style={{ fontSize: "13.5px", lineHeight: 1.72, color: "var(--color-text-secondary)", margin: "6px 0" }}>
+        {renderInline(line)}
+      </p>
+    );
+    i++;
+  }
+
+  return (
+    <div style={{ fontFamily: "var(--font-sans)" }}>
+      {blocks}
     </div>
   );
 }
@@ -231,7 +373,7 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35 }}
               className="rounded-2xl border p-5"
-              style={{ border: "1px solid var(--color-border)", background: "rgba(19,22,31,0.8)" }}
+              style={{ border: "1px solid rgba(255,255,255,0.06)", background: "#0f1018", boxShadow: "var(--shadow-m)" }}
             >
               <div className="flex items-center gap-2 flex-wrap mb-3">
                 <DifficultyBadge difficulty={challenge.difficulty} />
@@ -270,13 +412,14 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
               <div
                 className="rounded-xl p-3.5"
                 style={{
-                  border: "1px solid rgba(124,106,247,0.2)",
-                  background: "linear-gradient(135deg, rgba(124,106,247,0.07) 0%, rgba(124,106,247,0.03) 100%)",
+                  border: "1px solid rgba(255,255,255,0.07)",
+                  background: "rgba(255,255,255,0.025)",
+                  boxShadow: "var(--shadow-s)",
                 }}
               >
                 <p
                   className="flex items-center gap-1.5 text-xs font-semibold mb-1.5"
-                  style={{ color: "var(--color-accent)" }}
+                  style={{ color: "var(--color-text-secondary)" }}
                 >
                   <Brain size={12} />
                   Why this matters in AI
@@ -293,7 +436,7 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, delay: 0.05 }}
               className="rounded-2xl border p-5"
-              style={{ border: "1px solid var(--color-border)", background: "rgba(19,22,31,0.8)" }}
+              style={{ border: "1px solid rgba(255,255,255,0.06)", background: "#0f1018", boxShadow: "var(--shadow-m)" }}
             >
               <MarkdownBlock content={challenge.description} />
             </motion.div>
@@ -305,7 +448,7 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35, delay: 0.1 }}
                 className="rounded-2xl border overflow-hidden"
-                style={{ border: "1px solid var(--color-border)", background: "rgba(19,22,31,0.8)" }}
+                style={{ border: "1px solid rgba(255,255,255,0.06)", background: "#0f1018", boxShadow: "var(--shadow-m)" }}
               >
                 <button
                   className="w-full flex items-center justify-between px-5 py-3.5 text-sm font-medium transition-colors duration-150"
@@ -389,9 +532,9 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
                   exit={{ opacity: 0, y: -6 }}
                   className="flex items-center gap-2.5 p-3 rounded-xl text-sm"
                   style={{
-                    border: "1px solid rgba(124,106,247,0.25)",
-                    background: "rgba(124,106,247,0.06)",
-                    color: "var(--color-accent)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    background: "rgba(255,255,255,0.03)",
+                    color: "var(--color-text-secondary)",
                   }}
                 >
                   <Loader2 size={13} className="animate-spin" />
@@ -510,10 +653,11 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
                           <motion.div
                             whileHover={{ scale: 1.008 }}
                             whileTap={{ scale: 0.994 }}
-                            className="w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-sm text-white cursor-pointer select-none"
+                            className="w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-sm cursor-pointer select-none"
                             style={{
-                              background: "linear-gradient(135deg, #7c6af7 0%, #9585ff 100%)",
-                              boxShadow: "0 4px 24px rgba(124,106,247,0.45), 0 0 0 1px rgba(124,106,247,0.2)",
+                              background: "#a4abbe",
+                              color: "#07070d",
+                              boxShadow: "var(--shadow-m)",
                             }}
                           >
                             Continue
@@ -525,10 +669,11 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
                           <motion.div
                             whileHover={{ scale: 1.008 }}
                             whileTap={{ scale: 0.994 }}
-                            className="w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-sm text-white cursor-pointer select-none"
+                            className="w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-sm cursor-pointer select-none"
                             style={{
-                              background: "linear-gradient(135deg, #7c6af7 0%, #9585ff 100%)",
-                              boxShadow: "0 4px 24px rgba(124,106,247,0.45)",
+                              background: "#a4abbe",
+                              color: "#07070d",
+                              boxShadow: "var(--shadow-m)",
                             }}
                           >
                             Back to Curriculum
@@ -564,13 +709,12 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
                   exit={{ opacity: 0, y: -4 }}
                   transition={{ duration: 0.28 }}
                   whileTap={pyReady && !running ? { scale: 0.98 } : {}}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm text-white disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm disabled:opacity-35 disabled:cursor-not-allowed"
                   style={{
-                    background: running
-                      ? "linear-gradient(135deg, #5a4fcf 0%, #6b5ed8 100%)"
-                      : "linear-gradient(135deg, #7c6af7 0%, #9585ff 100%)",
-                    boxShadow: pyReady && !running ? "0 4px 20px rgba(124,106,247,0.3)" : "none",
-                    transition: "background 0.3s ease, box-shadow 0.3s ease",
+                    background: running ? "rgba(164,171,190,0.75)" : "#a4abbe",
+                    color: "#07070d",
+                    boxShadow: pyReady && !running ? "var(--shadow-m)" : "none",
+                    transition: "background 0.2s ease, box-shadow 0.2s ease",
                   }}
                 >
                   {running ? (

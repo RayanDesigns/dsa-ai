@@ -17,7 +17,7 @@ function PanelShell({ children }: { children: React.ReactNode }) {
       style={{
         border: "1px solid #1a1d2e",
         background: "#0b0d14",
-        boxShadow: "0 0 0 1px rgba(124,106,247,0.04), 0 8px 32px rgba(0,0,0,0.35)",
+        boxShadow: "var(--shadow-s)",
       }}
     >
       {/* Panel header */}
@@ -53,7 +53,7 @@ export function TestResultPanel({ results, running, stdout, runError }: Props) {
               <motion.span
                 key={i}
                 className="block w-[3px] rounded-full"
-                style={{ background: "#7c6af7", originY: 1 }}
+                style={{ background: "rgba(255,255,255,0.5)", originY: 1 }}
                 animate={{ scaleY: [0.3, 1, 0.3], opacity: [0.4, 1, 0.4] }}
                 transition={{ duration: 0.9, delay: i * 0.1, repeat: Infinity, ease: "easeInOut" }}
               />

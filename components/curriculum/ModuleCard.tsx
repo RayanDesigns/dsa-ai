@@ -48,23 +48,23 @@ export function ModuleCard({ module, completedCount, isUnlocked, isCurrent, inde
         } : {}),
         ...(isCurrent ? {
           border: `1px solid ${module.accentColor}60`,
-          background: `linear-gradient(135deg, ${accentRgb ? `rgba(${accentRgb},0.06)` : "rgba(124,106,247,0.06)"} 0%, #13161f 60%)`,
-          boxShadow: `0 0 0 1px ${module.accentColor}30, 0 8px 32px ${module.accentColor}14`,
+          background: `linear-gradient(135deg, ${accentRgb ? `rgba(${accentRgb},0.06)` : "rgba(255,255,255,0.03)"} 0%, #13161f 60%)`,
+          boxShadow: `var(--shadow-m)`,
         } : {}),
         ...(isComplete ? {
-          boxShadow: "0 4px 20px rgba(16,185,129,0.08)",
+          boxShadow: "var(--shadow-s)",
         } : {}),
       }}
       onMouseEnter={(e) => {
         if (!isUnlocked) return;
         const el = e.currentTarget as HTMLElement;
         if (isCurrent) {
-          el.style.boxShadow = `0 0 0 1px ${module.accentColor}50, 0 12px 40px ${module.accentColor}22`;
+          el.style.boxShadow = `var(--shadow-l)`;
         } else if (isComplete) {
-          el.style.boxShadow = "0 8px 32px rgba(16,185,129,0.14)";
+          el.style.boxShadow = "var(--shadow-m)";
           el.style.borderColor = "rgba(16,185,129,0.45)";
         } else {
-          el.style.boxShadow = `0 8px 32px ${module.accentColor}12`;
+          el.style.boxShadow = `var(--shadow-m)`;
           el.style.borderColor = `${module.accentColor}40`;
         }
       }}
@@ -72,9 +72,9 @@ export function ModuleCard({ module, completedCount, isUnlocked, isCurrent, inde
         if (!isUnlocked) return;
         const el = e.currentTarget as HTMLElement;
         if (isCurrent) {
-          el.style.boxShadow = `0 0 0 1px ${module.accentColor}30, 0 8px 32px ${module.accentColor}14`;
+          el.style.boxShadow = `var(--shadow-m)`;
         } else if (isComplete) {
-          el.style.boxShadow = "0 4px 20px rgba(16,185,129,0.08)";
+          el.style.boxShadow = "var(--shadow-s)";
           el.style.borderColor = "rgba(16,185,129,0.3)";
         } else {
           el.style.boxShadow = "";
@@ -99,42 +99,51 @@ export function ModuleCard({ module, completedCount, isUnlocked, isCurrent, inde
         ) : null}
       </div>
 
-      {/* Module icon */}
+      {/* Module icon — Level 1 inside the Level 2 card */}
       <div
         className="w-10 h-10 rounded-xl flex items-center justify-center mb-4"
         style={{
-          backgroundColor: `${module.accentColor}18`,
+          backgroundColor: `${module.accentColor}14`,
           color: module.accentColor,
-          boxShadow: isCurrent ? `0 0 16px ${module.accentColor}25` : undefined,
+          boxShadow: "var(--shadow-xs)",
+          border: `1px solid ${module.accentColor}20`,
         }}
       >
-        <Icon size={20} />
+        <Icon size={19} />
       </div>
 
       {/* Title + description */}
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-1.5">
           <span
-            className="text-[10px] font-mono uppercase tracking-wider"
+            className="text-[10px] font-mono uppercase tracking-[0.1em]"
             style={{ color: "var(--color-text-tertiary)" }}
           >
-            M{module.order + 1}
+            M{String(module.order + 1).padStart(2, "0")}
           </span>
           {isCurrent && !isComplete && (
             <span
               className="badge-current text-[10px] px-1.5 py-0.5 rounded-md font-semibold tracking-wide"
               style={{
-                background: `${module.accentColor}20`,
+                background: `${module.accentColor}15`,
                 color: module.accentColor,
-                border: `1px solid ${module.accentColor}30`,
+                border: `1px solid ${module.accentColor}28`,
+                boxShadow: "var(--shadow-xs)",
               }}
             >
               ACTIVE
             </span>
           )}
           {isComplete && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded-md font-semibold tracking-wide"
-              style={{ background: "rgba(16,185,129,0.12)", color: "#10b981", border: "1px solid rgba(16,185,129,0.25)" }}>
+            <span
+              className="text-[10px] px-1.5 py-0.5 rounded-md font-semibold tracking-wide"
+              style={{
+                background: "rgba(16,185,129,0.1)",
+                color: "#10b981",
+                border: "1px solid rgba(16,185,129,0.2)",
+                boxShadow: "var(--shadow-xs)",
+              }}
+            >
               DONE
             </span>
           )}
@@ -153,15 +162,15 @@ export function ModuleCard({ module, completedCount, isUnlocked, isCurrent, inde
         </p>
       </div>
 
-      {/* Progress bar */}
+      {/* Progress bar — recessed (inset shadow = below card surface) */}
       <div className="space-y-1.5">
-        <div className="flex justify-between" style={{ fontSize: "11px", color: "var(--color-text-secondary)" }}>
+        <div className="flex justify-between" style={{ fontSize: "11px", color: "var(--color-text-tertiary)" }}>
           <span>{completedCount}/{total} challenges</span>
-          <span>{module.estimatedMinutes} min</span>
+          <span className="font-mono">{module.estimatedMinutes} min</span>
         </div>
         <div
           className="h-1.5 rounded-full overflow-hidden"
-          style={{ background: "var(--color-border)" }}
+          style={{ background: "rgba(0,0,0,0.35)", boxShadow: "var(--shadow-inset)" }}
         >
           <div
             className={pct > 0 && pct < 100 ? "h-full rounded-full shimmer" : "h-full rounded-full"}
@@ -169,21 +178,31 @@ export function ModuleCard({ module, completedCount, isUnlocked, isCurrent, inde
               width: `${pct}%`,
               background: isComplete
                 ? "linear-gradient(90deg, #10b981, #34d399)"
-                : `linear-gradient(90deg, ${module.accentColor}, ${lightenHex(module.accentColor)})`,
+                : `linear-gradient(90deg, ${module.accentColor}cc, ${lightenHex(module.accentColor)})`,
               transition: "width 0.8s cubic-bezier(0.34, 1.1, 0.64, 1)",
-              boxShadow: pct > 0 ? `0 0 8px ${module.accentColor}50` : undefined,
             }}
           />
         </div>
       </div>
 
-      {/* XP */}
+      {/* XP — subtle footer */}
       <div
-        className="mt-3 flex items-center gap-1 text-[11px] font-mono font-medium"
-        style={{ color: "#f59e0b" }}
+        className="mt-3 pt-3 flex items-center justify-between"
+        style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}
       >
-        <span style={{ opacity: 0.7 }}>⚡</span>
-        {module.totalXP} XP
+        <div
+          className="flex items-center gap-1 text-[11px] font-mono font-medium"
+          style={{ color: "#f59e0b" }}
+        >
+          <span style={{ opacity: 0.6 }}>⚡</span>
+          {module.totalXP} XP
+        </div>
+        <span
+          className="text-[10px] font-mono"
+          style={{ color: "var(--color-text-tertiary)" }}
+        >
+          {total} challenges
+        </span>
       </div>
     </div>
   );

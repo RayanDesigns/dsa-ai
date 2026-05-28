@@ -26,8 +26,8 @@ type Piece = {
 };
 
 const COLORS = [
-  "#7c6af7", "#9585ff", "#f59e0b", "#10b981",
-  "#3b82f6", "#ec4899", "#f97316", "#a78bfa",
+  "#ffffff", "#f0f0f0", "#f59e0b", "#10b981",
+  "#3b82f6", "#ec4899", "#f97316", "#60a5fa",
 ];
 
 function useConfetti(show: boolean) {
@@ -111,15 +111,15 @@ export function CelebrationOverlay({
             className="relative w-full max-w-sm mx-4 rounded-2xl p-8 text-center"
             style={{
               background: "linear-gradient(160deg, #0f1120 0%, #13161f 100%)",
-              border: "1px solid rgba(124,106,247,0.35)",
-              boxShadow: "0 0 80px rgba(124,106,247,0.2), 0 0 0 1px rgba(124,106,247,0.1), 0 32px 64px rgba(0,0,0,0.6)",
+              border: "1px solid rgba(255,255,255,0.09)",
+              boxShadow: "var(--shadow-l)",
             }}
           >
             {/* Glow ring behind checkmark */}
             <div
               className="absolute inset-0 rounded-2xl pointer-events-none"
               style={{
-                background: "radial-gradient(ellipse at 50% 0%, rgba(124,106,247,0.15) 0%, transparent 60%)",
+                background: "radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.04) 0%, transparent 60%)",
               }}
             />
 
@@ -186,10 +186,11 @@ export function CelebrationOverlay({
                   <motion.div
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.97 }}
-                    className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-sm text-white cursor-pointer"
+                    className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-sm cursor-pointer"
                     style={{
-                      background: "linear-gradient(135deg, #7c6af7 0%, #9585ff 100%)",
-                      boxShadow: "0 4px 24px rgba(124,106,247,0.5), 0 0 0 1px rgba(124,106,247,0.2)",
+                      background: "#a4abbe",
+                      color: "#07070d",
+                      boxShadow: "var(--shadow-m)",
                     }}
                   >
                     Next: {nextChallenge.title}
@@ -201,10 +202,11 @@ export function CelebrationOverlay({
                   <motion.div
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.97 }}
-                    className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-sm text-white cursor-pointer"
+                    className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-sm cursor-pointer"
                     style={{
-                      background: "linear-gradient(135deg, #7c6af7 0%, #9585ff 100%)",
-                      boxShadow: "0 4px 24px rgba(124,106,247,0.5)",
+                      background: "#a4abbe",
+                      color: "#07070d",
+                      boxShadow: "var(--shadow-m)",
                     }}
                   >
                     All done — back to curriculum

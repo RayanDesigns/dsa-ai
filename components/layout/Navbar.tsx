@@ -33,14 +33,14 @@ export function Navbar() {
           <div
             className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
             style={{
-              background: "linear-gradient(135deg, rgba(124,106,247,0.3) 0%, rgba(124,106,247,0.12) 100%)",
-              border: "1px solid rgba(124,106,247,0.3)",
-              boxShadow: "0 0 12px rgba(124,106,247,0.15)",
+              background: "rgba(255,255,255,0.06)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              boxShadow: "var(--shadow-s)",
             }}
           >
             <span
               className="font-display font-bold"
-              style={{ fontSize: "11px", color: "#9585ff", letterSpacing: "0.02em" }}
+              style={{ fontSize: "11px", color: "var(--color-text-primary)", letterSpacing: "0.02em" }}
             >
               D
             </span>
@@ -64,38 +64,8 @@ export function Navbar() {
         {/* Nav links — landing page only */}
         {isLanding && (
           <ul style={{ display: "flex", alignItems: "center", gap: "32px", listStyle: "none", margin: 0, padding: 0 }}>
-            <li>
-              <a
-                href="#curriculum"
-                style={{
-                  fontSize: "14px",
-                  fontWeight: 500,
-                  color: "var(--color-text-secondary)",
-                  textDecoration: "none",
-                  transition: "color 0.15s",
-                }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--color-text-primary)"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--color-text-secondary)"; }}
-              >
-                Curriculum
-              </a>
-            </li>
-            <li>
-              <a
-                href="#how"
-                style={{
-                  fontSize: "14px",
-                  fontWeight: 500,
-                  color: "var(--color-text-secondary)",
-                  textDecoration: "none",
-                  transition: "color 0.15s",
-                }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--color-text-primary)"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--color-text-secondary)"; }}
-              >
-                How it works
-              </a>
-            </li>
+            <li><a href="#curriculum" className="nav-link">Curriculum</a></li>
+            <li><a href="#how" className="nav-link">How it works</a></li>
           </ul>
         )}
 
@@ -108,64 +78,9 @@ export function Navbar() {
 
         {/* Landing CTA buttons */}
         {isLanding && (
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <button
-              onClick={signInWithGoogle}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "7px 16px",
-                borderRadius: "8px",
-                fontFamily: "var(--font-sans)",
-                fontSize: "13.5px",
-                fontWeight: 600,
-                background: "transparent",
-                color: "var(--color-text-secondary)",
-                border: "1px solid var(--color-border)",
-                cursor: "pointer",
-                transition: "all 0.15s",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.background = "var(--color-bg-card)";
-                (e.currentTarget as HTMLElement).style.color = "var(--color-text-primary)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.background = "transparent";
-                (e.currentTarget as HTMLElement).style.color = "var(--color-text-secondary)";
-              }}
-            >
-              Sign in
-            </button>
-            <button
-              onClick={signInWithGoogle}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "7px 16px",
-                borderRadius: "8px",
-                fontFamily: "var(--font-sans)",
-                fontSize: "13.5px",
-                fontWeight: 600,
-                background: "var(--color-accent)",
-                color: "#fff",
-                border: "none",
-                cursor: "pointer",
-                boxShadow: "0 0 20px rgba(124,106,247,0.3)",
-                transition: "all 0.15s",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.background = "var(--color-accent-hover)";
-                (e.currentTarget as HTMLElement).style.boxShadow = "0 0 28px rgba(124,106,247,0.45)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.background = "var(--color-accent)";
-                (e.currentTarget as HTMLElement).style.boxShadow = "0 0 20px rgba(124,106,247,0.3)";
-              }}
-            >
-              Start for free
-            </button>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <button onClick={signInWithGoogle} className="btn-nav-ghost">Sign in</button>
+            <button onClick={signInWithGoogle} className="btn-nav-primary">Start for free</button>
           </div>
         )}
 
@@ -176,8 +91,8 @@ export function Navbar() {
               <div
                 className="rounded-full overflow-hidden"
                 style={{
-                  border: "1.5px solid rgba(28,32,51,0.9)",
-                  boxShadow: "0 0 0 2px rgba(124,106,247,0.15)",
+                  border: "1.5px solid rgba(255,255,255,0.08)",
+                  boxShadow: "0 0 0 2px rgba(255,255,255,0.06)",
                 }}
               >
                 <Image
@@ -191,16 +106,7 @@ export function Navbar() {
             )}
             <button
               onClick={signOutUser}
-              className="p-1.5 rounded-lg transition-all duration-150"
-              style={{ color: "var(--color-text-tertiary)" }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.color = "var(--color-error)";
-                (e.currentTarget as HTMLElement).style.background = "rgba(248,113,113,0.08)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.color = "var(--color-text-tertiary)";
-                (e.currentTarget as HTMLElement).style.background = "";
-              }}
+              className="btn-signout"
               title="Sign out"
             >
               <LogOut size={15} />
