@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRef } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { PathMap } from "@/components/curriculum/PathMap";
@@ -45,230 +46,99 @@ function FadeIn({
   );
 }
 
-// ─── Challenge card mockup ─────────────────────────────────────────────────
-function ChallengeCardMockup() {
+
+// ─── Hero backdrop: concentric rings + horizon glow (from Figma source) ─────
+function HeroOrb() {
+  // Three concentric discs lit from the top, fading downward — matches the
+  // source's Ellipse 4/5/7 stack (radii 534 / 381 / 286, #888 → transparent).
+  const rings = [
+    { d: 1068 },
+    { d: 762 },
+    { d: 573 },
+  ];
   return (
-    <div style={{ position: "relative" }}>
-      {/* Ambient glow */}
+    <div
+      aria-hidden
+      style={{
+        position: "absolute",
+        inset: 0,
+        overflow: "hidden",
+        pointerEvents: "none",
+        zIndex: 0,
+      }}
+    >
+      {/* Faint starfield */}
       <div
-        aria-hidden
         style={{
           position: "absolute",
-          inset: "-60px",
-          background: "radial-gradient(ellipse at center, rgba(255,255,255,0.03) 0%, transparent 65%)",
-          pointerEvents: "none",
+          inset: 0,
+          backgroundImage:
+            "radial-gradient(1px 1px at 20% 22%, rgba(255,255,255,0.35), transparent), radial-gradient(1px 1px at 68% 14%, rgba(255,255,255,0.25), transparent), radial-gradient(1px 1px at 82% 30%, rgba(255,255,255,0.3), transparent), radial-gradient(1px 1px at 38% 40%, rgba(255,255,255,0.18), transparent), radial-gradient(1px 1px at 12% 46%, rgba(255,255,255,0.22), transparent), radial-gradient(1px 1px at 90% 50%, rgba(255,255,255,0.2), transparent), radial-gradient(1px 1px at 55% 26%, rgba(255,255,255,0.22), transparent)",
+          opacity: 0.55,
+          mixBlendMode: "plus-lighter",
         }}
       />
-      <motion.div
-        animate={{ y: [0, -8, 0] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+
+      {/* Concentric rings, centered where the product mockup rises */}
+      <div
         style={{
-          background: "var(--color-bg-card)",
-          border: "1px solid var(--color-border)",
-          borderRadius: "16px",
-          overflow: "hidden",
-          boxShadow: "var(--shadow-l)",
-          position: "relative",
+          position: "absolute",
+          left: "50%",
+          top: "560px",
+          transform: "translateX(-50%)",
+          mixBlendMode: "plus-lighter",
         }}
       >
-        {/* Topbar */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "11px 16px",
-            background: "var(--color-bg-elevated)",
-            borderBottom: "1px solid var(--color-border-subtle)",
-          }}
-        >
+        {rings.map((r, i) => (
           <div
+            key={i}
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "5px",
-              fontFamily: "var(--font-mono)",
-              fontSize: "11px",
-              color: "var(--color-text-tertiary)",
+              position: "absolute",
+              left: "50%",
+              top: "50%",
+              width: `${r.d}px`,
+              height: `${r.d}px`,
+              transform: "translate(-50%, -50%)",
+              borderRadius: "50%",
+              background:
+                "linear-gradient(to bottom, rgba(150,158,180,0.55) 0%, rgba(150,158,180,0) 50%)",
+              opacity: 0.16,
             }}
-          >
-            <span>Module 1</span>
-            <span style={{ opacity: 0.4 }}>&nbsp;/&nbsp;</span>
-            <span style={{ color: "var(--color-text-secondary)" }}>Vectors &amp; Embeddings</span>
-            <span style={{ opacity: 0.4 }}>&nbsp;/&nbsp;</span>
-            <span style={{ color: "var(--color-text-secondary)" }}>Ch 1.2</span>
-          </div>
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "4px",
-              padding: "3px 10px",
-              background: "rgba(245,158,11,0.08)",
-              border: "1px solid rgba(245,158,11,0.2)",
-              borderRadius: "100px",
-              fontFamily: "var(--font-mono)",
-              fontSize: "11px",
-              fontWeight: 700,
-              color: "var(--color-xp)",
-            }}
-          >
-            ⚡ +75 XP
-          </div>
-        </div>
+          />
+        ))}
+      </div>
 
-        {/* Title block */}
-        <div style={{ padding: "16px 16px 0" }}>
-          <h4
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "15px",
-              fontWeight: 700,
-              color: "var(--color-text-primary)",
-              marginBottom: "4px",
-            }}
-          >
-            Cosine Similarity Search
-          </h4>
-          <p
-            style={{
-              fontSize: "12px",
-              color: "var(--color-text-secondary)",
-              lineHeight: 1.55,
-              marginBottom: "14px",
-            }}
-          >
-            Core to every embedding-based retrieval system — semantic search, RAG pipelines,
-            recommendation engines.
-          </p>
-        </div>
+      {/* Blurred white horizon bar where the dashboard top sits */}
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: "600px",
+          transform: "translateX(-50%)",
+          width: "620px",
+          height: "60px",
+          background: "#ffffff",
+          borderRadius: "50%",
+          filter: "blur(60px)",
+          opacity: 0.22,
+          mixBlendMode: "plus-lighter",
+        }}
+      />
 
-        {/* Code block */}
-        <div
-          style={{
-            background: "#070910",
-            borderTop: "1px solid var(--color-border-subtle)",
-            borderBottom: "1px solid var(--color-border-subtle)",
-            fontFamily: "var(--font-mono)",
-            fontSize: "12.5px",
-            lineHeight: 1.75,
-            padding: "14px 0",
-          }}
-        >
-          {[
-            [<><span style={{ color: "#c792ea" }}>import</span> numpy <span style={{ color: "#c792ea" }}>as</span> np</>, "1"],
-            [<>&nbsp;</>, "2"],
-            [<><span style={{ color: "#c792ea" }}>def</span> <span style={{ color: "#22d3ee" }}>cosine_similarity</span>(<span style={{ color: "#f78c6c" }}>a</span>: np.ndarray, <span style={{ color: "#f78c6c" }}>b</span>: np.ndarray) -&gt; <span style={{ color: "#9585ff" }}>float</span>:</>, "3"],
-            [<>&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: "#3a4560", fontStyle: "italic" }}># Embedding retrieval: find nearest neighbor</span></>, "4"],
-            [<>&nbsp;&nbsp;&nbsp;&nbsp;dot = np.<span style={{ color: "#22d3ee" }}>dot</span>(<span style={{ color: "#f78c6c" }}>a</span>, <span style={{ color: "#f78c6c" }}>b</span>)</>, "5"],
-            [<>&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: "#c792ea" }}>return</span> dot / (np.<span style={{ color: "#22d3ee" }}>linalg</span>.<span style={{ color: "#22d3ee" }}>norm</span>(<span style={{ color: "#f78c6c" }}>a</span>) * np.<span style={{ color: "#22d3ee" }}>linalg</span>.<span style={{ color: "#22d3ee" }}>norm</span>(<span style={{ color: "#f78c6c" }}>b</span>))</>, "6"],
-          ].map(([code, ln], i) => (
-            <div key={i} style={{ display: "flex", padding: "0 14px" }}>
-              <span
-                style={{
-                  color: "var(--color-text-tertiary)",
-                  width: "20px",
-                  textAlign: "right",
-                  marginRight: "14px",
-                  flexShrink: 0,
-                  userSelect: "none",
-                  opacity: 0.5,
-                }}
-              >
-                {ln}
-              </span>
-              <span style={{ flex: 1 }}>{code}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Run bar */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "10px 16px",
-            background: "var(--color-bg-elevated)",
-          }}
-        >
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--color-text-tertiary)", opacity: 0.7 }}>
-            ⌘ Enter to run
-          </span>
-          <button
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              padding: "5px 14px",
-              background: "var(--color-accent)",
-              color: "#fff",
-              borderRadius: "6px",
-              border: "none",
-              fontFamily: "var(--font-sans)",
-              fontSize: "12px",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            ▶ Run Tests
-          </button>
-        </div>
-
-        {/* Test results */}
-        <div style={{ padding: "12px 16px", display: "flex", flexDirection: "column", gap: "8px" }}>
-          {[
-            ["identical vectors → ", "1.0"],
-            ["orthogonal vectors → ", "0.0"],
-            ["nearest neighbor search: ", "correct"],
-            ["10 k embeddings searched in ", "18 ms"],
-          ].map(([label, val], i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: "9px", fontFamily: "var(--font-mono)", fontSize: "12px" }}>
-              <div
-                style={{
-                  width: "16px",
-                  height: "16px",
-                  borderRadius: "50%",
-                  flexShrink: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background: "rgba(16,185,129,0.12)",
-                  color: "var(--color-success)",
-                  fontSize: "9px",
-                  fontWeight: 700,
-                }}
-              >
-                ✓
-              </div>
-              <span style={{ color: "var(--color-text-secondary)" }}>
-                {label}<em style={{ fontStyle: "normal", color: "var(--color-text-primary)" }}>{val}</em>
-              </span>
-            </div>
-          ))}
-        </div>
-
-        {/* XP banner */}
-        <div
-          style={{
-            margin: "4px 16px 14px",
-            padding: "9px 14px",
-            background: "rgba(245,158,11,0.06)",
-            border: "1px solid rgba(245,158,11,0.15)",
-            borderRadius: "8px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "8px",
-            fontFamily: "var(--font-mono)",
-            fontSize: "12px",
-            fontWeight: 700,
-            color: "var(--color-xp)",
-          }}
-        >
-          ⚡ All tests passed — +75 XP earned
-        </div>
-      </motion.div>
+      {/* Soft ambient pool behind the headline */}
+      <div
+        style={{
+          position: "absolute",
+          top: "120px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "820px",
+          height: "440px",
+          background:
+            "radial-gradient(ellipse 60% 60% at 50% 50%, rgba(150,158,180,0.08) 0%, transparent 70%)",
+          filter: "blur(8px)",
+        }}
+      />
     </div>
   );
 }
@@ -288,184 +158,219 @@ function LandingPage() {
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <section
         style={{
-          minHeight: "100vh",
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
-          padding: "120px 48px 100px",
+          padding: "140px 24px 0",
           position: "relative",
           overflow: "hidden",
-          backgroundImage: `radial-gradient(ellipse 80% 60% at 75% 30%, rgba(255,255,255,0.02) 0%, transparent 60%)`,
         }}
       >
+        {/* Glowing orb / horizon backdrop */}
+        <HeroOrb />
+
         <div
           style={{
-            maxWidth: "1240px",
-            margin: "0 auto",
+            maxWidth: "880px",
             width: "100%",
-            display: "grid",
-            gridTemplateColumns: "1fr 500px",
-            gap: "80px",
-            alignItems: "center",
+            margin: "0 auto",
+            textAlign: "center",
             position: "relative",
+            zIndex: 1,
           }}
         >
-          {/* Left: headline */}
-          <div>
-            {/* Eyebrow badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45 }}
+          {/* Eyebrow badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45 }}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "5px 14px",
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: "100px",
+              fontSize: "12px",
+              fontWeight: 600,
+              color: "var(--color-text-secondary)",
+              marginBottom: "32px",
+            }}
+          >
+            <motion.span
+              animate={{ opacity: [1, 0.25, 1] }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                padding: "5px 14px",
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.1)",
-                borderRadius: "100px",
-                fontSize: "12px",
-                fontWeight: 600,
-                color: "var(--color-text-secondary)",
-                marginBottom: "32px",
+                width: "5px",
+                height: "5px",
+                background: "var(--color-text-secondary)",
+                borderRadius: "50%",
+                display: "inline-block",
+                flexShrink: 0,
               }}
-            >
-              <motion.span
-                animate={{ opacity: [1, 0.25, 1] }}
-                transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-                style={{
-                  width: "5px",
-                  height: "5px",
-                  background: "var(--color-text-secondary)",
-                  borderRadius: "50%",
-                  display: "inline-block",
-                  flexShrink: 0,
-                }}
-              />
-              Python in the browser · No installs · XP-gated progression
-            </motion.div>
+            />
+            Python in the browser · No installs · XP-gated progression
+          </motion.div>
 
-            {/* H1 */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.65, delay: 0.07, ease: [0.22, 1, 0.36, 1] }}
+          {/* H1 */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.07, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(2.6rem, 5.2vw, 4rem)",
+              fontWeight: 800,
+              lineHeight: 1.05,
+              letterSpacing: "-0.035em",
+              marginBottom: "26px",
+            }}
+          >
+            The smarter way to learn{" "}
+            <br className="hero-br" />
+            the algorithms behind{" "}
+            <span
               style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(2.8rem, 4.8vw, 4rem)",
-                fontWeight: 800,
-                lineHeight: 1.04,
-                letterSpacing: "-0.035em",
-                marginBottom: "28px",
+                background: "linear-gradient(118deg, #d0d4e4 0%, #707080 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
               }}
             >
-              The algorithms<br />
-              powering{" "}
-              <span
+              AI.
+            </span>
+          </motion.h1>
+
+          {/* Subtext */}
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, delay: 0.14 }}
+            style={{
+              fontSize: "17px",
+              lineHeight: 1.72,
+              color: "var(--color-text-secondary)",
+              maxWidth: "540px",
+              margin: "0 auto 40px",
+            }}
+          >
+            Not &ldquo;implement a hash map&rdquo; —{" "}
+            <strong style={{ color: "var(--color-text-primary)", fontWeight: 600 }}>
+              build the token lookup table that powers a tokenizer.
+            </strong>{" "}
+            24 challenges grounded in the AI systems where they live.
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.2 }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "12px",
+              marginBottom: "26px",
+            }}
+          >
+            <button onClick={signInWithGoogle} className="btn-light">
+              Start for free &nbsp;→
+            </button>
+            <button onClick={scrollToCurriculum} className="btn-ghost">
+              Browse Curriculum
+            </button>
+          </motion.div>
+
+          {/* Metrics */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.32 }}
+            style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+          >
+            {[
+              { val: "8", label: "modules" },
+              { val: "24", label: "challenges" },
+              { val: "2,500", label: "total XP" },
+              { val: "< 6h", label: "to complete" },
+            ].map((m, i) => (
+              <div
+                key={i}
                 style={{
-                  background: "linear-gradient(118deg, #d0d4e4 0%, #707080 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "3px",
+                  alignItems: "center",
+                  paddingRight: i < 3 ? "28px" : 0,
+                  marginRight: i < 3 ? "28px" : 0,
+                  borderRight: i < 3 ? "1px solid var(--color-border)" : "none",
                 }}
               >
-                AI.
-              </span>
-              <br />
-              Taught through the<br />
-              systems where they live.
-            </motion.h1>
-
-            {/* Subtext */}
-            <motion.p
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.14 }}
-              style={{
-                fontSize: "17px",
-                lineHeight: 1.72,
-                color: "var(--color-text-secondary)",
-                maxWidth: "460px",
-                marginBottom: "44px",
-              }}
-            >
-              Not &ldquo;implement a hash map&rdquo; —&nbsp;
-              <strong style={{ color: "var(--color-text-primary)", fontWeight: 600 }}>
-                &ldquo;build the token lookup table that powers a tokenizer.&rdquo;
-              </strong>
-            </motion.p>
-
-            {/* CTAs */}
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.2 }}
-              style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "56px" }}
-            >
-              <button onClick={signInWithGoogle} className="btn-primary">
-                Start Learning Free &nbsp;→
-              </button>
-              <button onClick={scrollToCurriculum} className="btn-ghost">
-                Browse Curriculum
-              </button>
-            </motion.div>
-
-            {/* Metrics */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.32 }}
-              style={{ display: "flex", alignItems: "center" }}
-            >
-              {[
-                { val: "8", label: "modules" },
-                { val: "24", label: "challenges" },
-                { val: "2,500", label: "total XP" },
-                { val: "< 6h", label: "to complete" },
-              ].map((m, i) => (
-                <div
-                  key={i}
+                <span
                   style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "3px",
-                    paddingRight: i < 3 ? "28px" : 0,
-                    marginRight: i < 3 ? "28px" : 0,
-                    borderRight: i < 3 ? "1px solid var(--color-border)" : "none",
+                    fontFamily: "var(--font-display)",
+                    fontSize: "24px",
+                    fontWeight: 800,
+                    color: "var(--color-text-primary)",
+                    lineHeight: 1,
                   }}
                 >
-                  <span
-                    style={{
-                      fontFamily: "var(--font-display)",
-                      fontSize: "24px",
-                      fontWeight: 800,
-                      color: "var(--color-text-primary)",
-                      lineHeight: 1,
-                    }}
-                  >
-                    {m.val}
-                  </span>
-                  <span style={{ fontSize: "12px", color: "var(--color-text-tertiary)" }}>
-                    {m.label}
-                  </span>
-                </div>
-              ))}
-            </motion.div>
-          </div>
-
-          {/* Right: challenge card */}
-          <motion.div
-            initial={{ opacity: 0, x: 28 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.72, delay: 0.22, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <ChallengeCardMockup />
+                  {m.val}
+                </span>
+                <span style={{ fontSize: "12px", color: "var(--color-text-tertiary)" }}>
+                  {m.label}
+                </span>
+              </div>
+            ))}
           </motion.div>
         </div>
+
+        {/* Product mockup — rises into the glow */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.34, ease: [0.22, 1, 0.36, 1] }}
+          style={{
+            maxWidth: "1000px",
+            width: "100%",
+            margin: "64px auto 0",
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          {/* Show the top ~half, fade the cut edge into the next section */}
+          <div
+            style={{
+              width: "100%",
+              aspectRatio: "2000 / 700",
+              overflow: "hidden",
+              maskImage:
+                "linear-gradient(to bottom, #000 0%, #000 60%, transparent 100%)",
+              WebkitMaskImage:
+                "linear-gradient(to bottom, #000 0%, #000 60%, transparent 100%)",
+            }}
+          >
+            <Image
+              src="/hero-dashboard.png"
+              alt="DSA for AI challenge workspace — problem statement beside an in-browser Python editor"
+              width={2000}
+              height={1440}
+              priority
+              sizes="(max-width: 1040px) 100vw, 1000px"
+              style={{
+                width: "100%",
+                height: "auto",
+                display: "block",
+              }}
+            />
+          </div>
+        </motion.div>
       </section>
 
       {/* ── THE DIFFERENCE ───────────────────────────────────────────────── */}
-      <section style={{ padding: "120px 48px", background: "var(--color-bg-secondary)" }}>
+      <section id="difference" style={{ padding: "120px 48px", background: "var(--color-bg-secondary)" }}>
         <div style={{ maxWidth: "1240px", margin: "0 auto" }}>
           <FadeIn>
             <p className="eyebrow">The difference</p>
@@ -992,25 +897,11 @@ function LandingPage() {
             fontSize: "15px",
           }}
         >
-          <div
-            style={{
-              width: "28px",
-              height: "28px",
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              borderRadius: "7px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "13px",
-              fontWeight: 800,
-              color: "var(--color-accent)",
-              fontFamily: "var(--font-mono)",
-            }}
-          >
-            Σ
-          </div>
-          DSA for AI
+          <span className="logo-mark" aria-hidden>
+            <span className="logo-mark-outer" />
+            <span className="logo-mark-inner" />
+          </span>
+          DSA AI
         </div>
         <p style={{ fontSize: "12px", color: "var(--color-text-tertiary)" }}>
           A focused, challenge-driven course for AI engineers. &copy; 2026

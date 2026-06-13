@@ -38,66 +38,44 @@ export function Navbar() {
     );
   }
 
-  // Logged out: full landing navbar
+  // Logged out: floating pill navbar (matches hero design)
   return (
-    <nav
-      className="sticky top-0 z-40"
-      style={{
-        borderBottom: "1px solid rgba(28,32,51,0.8)",
-        background: "rgba(9,9,14,0.85)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
-      }}
-    >
-      <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+    <nav className="nav-float">
+      <div className="nav-pill">
         {/* Logo */}
         <Link
           href="/"
           className="flex items-center gap-2.5 shrink-0 group"
           style={{ textDecoration: "none" }}
         >
-          <div
-            className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+          <span className="logo-mark" aria-hidden>
+            <span className="logo-mark-outer" />
+            <span className="logo-mark-inner" />
+          </span>
+          <span
+            className="font-display"
             style={{
-              background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              boxShadow: "var(--shadow-s)",
+              fontSize: "18px",
+              fontWeight: 600,
+              color: "#ffffff",
+              letterSpacing: "-0.01em",
             }}
           >
-            <span
-              className="font-display font-bold"
-              style={{ fontSize: "11px", color: "var(--color-text-primary)", letterSpacing: "0.02em" }}
-            >
-              D
-            </span>
-          </div>
-          <div className="flex items-baseline gap-1.5">
-            <span
-              className="font-display font-bold"
-              style={{ fontSize: "15px", color: "var(--color-text-primary)", letterSpacing: "-0.01em" }}
-            >
-              DSA
-            </span>
-            <span
-              className="font-sans"
-              style={{ fontSize: "12px", color: "var(--color-text-tertiary)", fontWeight: 400 }}
-            >
-              for AI
-            </span>
-          </div>
+            DSA AI
+          </span>
         </Link>
 
         {isLanding && (
-          <ul style={{ display: "flex", alignItems: "center", gap: "32px", listStyle: "none", margin: 0, padding: 0 }}>
+          <ul className="nav-links">
             <li><a href="#curriculum" className="nav-link">Curriculum</a></li>
             <li><a href="#how" className="nav-link">How it works</a></li>
+            <li><a href="#difference" className="nav-link">The difference</a></li>
           </ul>
         )}
 
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <button onClick={signInWithGoogle} className="btn-nav-ghost">Sign in</button>
-          <button onClick={signInWithGoogle} className="btn-nav-primary">Start for free</button>
-        </div>
+        <button onClick={signInWithGoogle} className="btn-light btn-light-sm shrink-0">
+          Start for free
+        </button>
       </div>
     </nav>
   );
